@@ -326,3 +326,6 @@ payload:
   # > CN
   - DOMAIN-SUFFIX,gov.cn
   - DOMAIN-SUFFIX,cn
+
+  # > 霸王龙压制组
+  - DOMAIN-SUFFIX,tzfile.com
