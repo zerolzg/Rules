@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "WebFetch(domain:esm.sh)",
+      "WebFetch(domain:registry.npmjs.org)",
+      "Bash(python3:*)",
+      "Bash(git checkout:*)"
+    ]
+  }
+}
