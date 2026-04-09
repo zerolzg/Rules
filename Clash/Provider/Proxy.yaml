@@ -699,6 +699,8 @@ payload:
   # > nodeseek
   - DOMAIN-SUFFIX,nodeseek.com
 
+  - DOMAIN-SUFFIX,rpc.unlock-protocol.com
+
   # > linux.do
   - DOMAIN-SUFFIX,linux.do
 
