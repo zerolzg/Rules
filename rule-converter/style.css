@@ -235,6 +235,71 @@ textarea { resize: vertical; min-height: 180px; tab-size: 2; }
 
 .btn-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 
+/* ─── Subscription List ─── */
+.sub-list { margin-top: 4px; }
+.sub-list-empty {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 6px 4px;
+  font-style: italic;
+}
+.sub-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  margin-bottom: 4px;
+  background: var(--surface2);
+  font-size: 11px;
+}
+.sub-item-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.sub-prefix {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.sub-no-prefix { color: var(--text-muted); }
+.sub-count {
+  background: var(--cyan-dim);
+  color: #fff;
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.sub-url {
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sub-raw {
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  margin-bottom: 8px;
+  padding: 8px;
+  background: var(--bg);
+  font-size: 11px;
+  max-height: 300px;
+  overflow: auto;
+}
+.sub-raw pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--text-dim);
+}
+.btn-sm { padding: 3px 8px; font-size: 10px; }
+
 /* ─── Section Labels ─── */
 .section-label {
   font-size: 10px;

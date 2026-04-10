@@ -3,455 +3,9 @@
    ═══════════════════════════════════════ */
 
 // ─────────────────────────────────────────
-// Default YAML content
-// ─────────────────────────────────────────
-const DEFAULT_HEAD = ``;
-
-const DEFAULT_RULES = `
-rules:
-  # 拦截 QUIC 流量功能（强制谷歌/YouTube回退到TCP，防降速）
-  - AND,((NETWORK,UDP),(DST-PORT,443)),REJECT
-  # 使用 Mihomo 内置的 geosite 拦截 BT 追踪器
-  - "GEOSITE,category-pt,DIRECT"
-  - "RULE-SET,AdBlock,AdBlock"
-  - "RULE-SET,HTTPDNS,HTTPDNS"
-  - "RULE-SET,Special,DIRECT"
-  - "RULE-SET,Netflix,Global TV"
-  - "RULE-SET,Disney Plus,Global TV"
-  - "RULE-SET,YouTube,YouTube"
-  - "RULE-SET,Max,Global TV"
-  - "RULE-SET,Spotify,Global TV"
-  - "RULE-SET,Abema TV,Asian TV"
-  - "RULE-SET,Bahamut,Asian TV"
-  - "RULE-SET,DMM,Asian TV"
-  - "RULE-SET,Fox+,Asian TV"
-  - "RULE-SET,Hulu Japan,Asian TV"
-  - "RULE-SET,IQ,Asian TV"
-  - "RULE-SET,Japonx,Asian TV"
-  - "RULE-SET,JOOX,Asian TV"
-  - "RULE-SET,KKBOX,Asian TV"
-  - "RULE-SET,KKTV,Asian TV"
-  - "RULE-SET,Line TV,Asian TV"
-  - "RULE-SET,myTV SUPER,Asian TV"
-  - "RULE-SET,Niconico,Asian TV"
-  - "RULE-SET,ViuTV,Asian TV"
-  - "RULE-SET,ABC,Global TV"
-  - "RULE-SET,Amazon,Global TV"
-  - "RULE-SET,BBC iPlayer,Global TV"
-  - "RULE-SET,DAZN,Global TV"
-  - "RULE-SET,Discovery Plus,Global TV"
-  - "RULE-SET,encoreTVB,Global TV"
-  - "RULE-SET,F1 TV,Global TV"
-  - "RULE-SET,Fox Now,Global TV"
-  - "RULE-SET,Hulu,Global TV"
-  - "RULE-SET,Pandora,Global TV"
-  - "RULE-SET,PBS,Global TV"
-  - "RULE-SET,Pornhub,Global TV"
-  - "RULE-SET,Soundcloud,Global TV"
-  - "RULE-SET,Bilibili,CN Mainland TV"
-  - "RULE-SET,IQIYI,CN Mainland TV"
-  - "RULE-SET,Letv,CN Mainland TV"
-  - "RULE-SET,Netease Music,CN Mainland TV"
-  - "RULE-SET,Tencent Video,CN Mainland TV"
-  - "RULE-SET,WeTV,CN Mainland TV"
-  - "RULE-SET,Youku,CN Mainland TV"
-  - "RULE-SET,Telegram,Telegram"
-  - "RULE-SET,Crypto,Crypto"
-  - "RULE-SET,Discord,Discord"
-  - "RULE-SET,Google FCM,Google FCM"
-  - "RULE-SET,Microsoft,Microsoft"
-  - "RULE-SET,AI Suite,AI Suite"
-  - "RULE-SET,PayPal,PayPal"
-  - "RULE-SET,Scholar,Scholar"
-  - "RULE-SET,Speedtest,Speedtest"
-  - "RULE-SET,Steam,Steam"
-  - "RULE-SET,TikTok,Global TV"
-  - "RULE-SET,Apple Music,Global TV"
-  - "RULE-SET,Apple News,Global TV"
-  - "RULE-SET,Apple TV,Global TV"
-  - "RULE-SET,Apple,Apple"
-  - "RULE-SET,miHoYo,miHoYo"
-  - "RULE-SET,PROXY,Proxy"
-  - "RULE-SET,Domestic,Domestic"
-  - "RULE-SET,Domestic IPs,Domestic"
-  - "RULE-SET,LAN,DIRECT"
-  - "GEOIP,CN,Domestic"
-  - "MATCH,Others"
-
-rule-providers:
-  AdBlock:
-    type: "http"
-    behavior: "domain"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/AdBlock.yaml"
-    path: ./Rules/AdBlock
-    interval: 86400
-  HTTPDNS:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/HTTPDNS.yaml"
-    path: ./Rules/HTTPDNS
-    interval: 86400
-  Special:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Special.yaml"
-    path: ./Rules/Special
-    interval: 86400
-  PROXY:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Proxy.yaml"
-    path: ./Rules/Proxy
-    interval: 86400
-  Domestic:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Domestic.yaml"
-    path: ./Rules/Domestic
-    interval: 86400
-  Domestic IPs:
-    type: "http"
-    behavior: "ipcidr"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Domestic%20IPs.yaml"
-    path: ./Rules/Domestic_IPs
-    interval: 86400
-  LAN:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/LAN.yaml"
-    path: ./Rules/LAN
-    interval: 86400
-  Netflix:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Netflix.yaml"
-    path: ./Rules/Media/Netflix
-    interval: 86400
-  Spotify:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Spotify.yaml"
-    path: ./Rules/Media/Spotify
-    interval: 86400
-  YouTube:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/YouTube.yaml"
-    path: ./Rules/Media/YouTube
-    interval: 86400
-  Max:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Max.yaml"
-    path: ./Rules/Media/Max
-    interval: 86400
-  Bilibili:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Bilibili.yaml"
-    path: ./Rules/Media/Bilibili
-    interval: 86400
-  IQ:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/IQ.yaml"
-    path: ./Rules/Media/IQI
-    interval: 86400
-  IQIYI:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/IQIYI.yaml"
-    path: ./Rules/Media/IQYI
-    interval: 86400
-  Letv:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Letv.yaml"
-    path: ./Rules/Media/Letv
-    interval: 86400
-  Netease Music:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Netease%20Music.yaml"
-    path: ./Rules/Media/Netease_Music
-    interval: 86400
-  Tencent Video:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Tencent%20Video.yaml"
-    path: ./Rules/Media/Tencent_Video
-    interval: 86400
-  Youku:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Youku.yaml"
-    path: ./Rules/Media/Youku
-    interval: 86400
-  WeTV:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/WeTV.yaml"
-    path: ./Rules/Media/WeTV
-    interval: 86400
-  ABC:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/ABC.yaml"
-    path: ./Rules/Media/ABC
-    interval: 86400
-  Abema TV:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Abema%20TV.yaml"
-    path: ./Rules/Media/Abema_TV
-    interval: 86400
-  Amazon:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Amazon.yaml"
-    path: ./Rules/Media/Amazon
-    interval: 86400
-  Apple Music:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Apple%20Music.yaml"
-    path: ./Rules/Media/Apple_Music
-    interval: 86400
-  Apple News:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Apple%20News.yaml"
-    path: ./Rules/Media/Apple_News
-    interval: 86400
-  Apple TV:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Apple%20TV.yaml"
-    path: ./Rules/Media/Apple_TV
-    interval: 86400
-  Bahamut:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Bahamut.yaml"
-    path: ./Rules/Media/Bahamut
-    interval: 86400
-  BBC iPlayer:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/BBC%20iPlayer.yaml"
-    path: ./Rules/Media/BBC_iPlayer
-    interval: 86400
-  DAZN:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/DAZN.yaml"
-    path: ./Rules/Media/DAZN
-    interval: 86400
-  Discovery Plus:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Discovery%20Plus.yaml"
-    path: ./Rules/Media/Discovery_Plus
-    interval: 86400
-  Disney Plus:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Disney%20Plus.yaml"
-    path: ./Rules/Media/Disney_Plus
-    interval: 86400
-  DMM:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/DMM.yaml"
-    path: ./Rules/Media/DMM
-    interval: 86400
-  encoreTVB:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/encoreTVB.yaml"
-    path: ./Rules/Media/encoreTVB
-    interval: 86400
-  F1 TV:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/F1%20TV.yaml"
-    path: ./Rules/Media/F1_TV
-    interval: 86400
-  Fox Now:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Fox%20Now.yaml"
-    path: ./Rules/Media/Fox_Now
-    interval: 86400
-  Fox+:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Fox%2B.yaml"
-    path: ./Rules/Media/Fox+
-    interval: 86400
-  Hulu Japan:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Hulu%20Japan.yaml"
-    path: ./Rules/Media/Hulu_Japan
-    interval: 86400
-  Hulu:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Hulu.yaml"
-    path: ./Rules/Media/Hulu
-    interval: 86400
-  Japonx:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Japonx.yaml"
-    path: ./Rules/Media/Japonx
-    interval: 86400
-  JOOX:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/JOOX.yaml"
-    path: ./Rules/Media/JOOX
-    interval: 86400
-  KKBOX:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/KKBOX.yaml"
-    path: ./Rules/Media/KKBOX
-    interval: 86400
-  KKTV:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/KKTV.yaml"
-    path: ./Rules/Media/KKTV
-    interval: 86400
-  Line TV:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Line%20TV.yaml"
-    path: ./Rules/Media/Line_TV
-    interval: 86400
-  myTV SUPER:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/myTV%20SUPER.yaml"
-    path: ./Rules/Media/myTV_SUPER
-    interval: 86400
-  Niconico:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Niconico.yaml"
-    path: ./Rules/Media/Niconico
-    interval: 86400
-  Pandora:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Pandora.yaml"
-    path: ./Rules/Media/Pandora
-    interval: 86400
-  PBS:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/PBS.yaml"
-    path: ./Rules/Media/PBS
-    interval: 86400
-  Pornhub:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Pornhub.yaml"
-    path: ./Rules/Media/Pornhub
-    interval: 86400
-  Soundcloud:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/Soundcloud.yaml"
-    path: ./Rules/Media/Soundcloud
-    interval: 86400
-  ViuTV:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Media/ViuTV.yaml"
-    path: ./Rules/Media/ViuTV
-    interval: 86400
-  Telegram:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Telegram.yaml"
-    path: ./Rules/Telegram
-    interval: 86400
-  Crypto:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Crypto.yaml"
-    path: ./Rules/Crypto
-    interval: 86400
-  Discord:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Discord.yaml"
-    path: ./Rules/Discord
-    interval: 86400
-  Steam:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Steam.yaml"
-    path: ./Rules/Steam
-    interval: 86400
-  TikTok:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/TikTok.yaml"
-    path: ./Rules/TikTok
-    interval: 86400
-  Speedtest:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Speedtest.yaml"
-    path: ./Rules/Speedtest
-    interval: 86400
-  PayPal:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/PayPal.yaml"
-    path: ./Rules/PayPal
-    interval: 86400
-  Microsoft:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Microsoft.yaml"
-    path: ./Rules/Microsoft
-    interval: 86400
-  AI Suite:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/AI%20Suite.yaml"
-    path: ./Rules/AI Suite
-    interval: 86400
-  Apple:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Apple.yaml"
-    path: ./Rules/Apple
-    interval: 86400
-  Google FCM:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Google%20FCM.yaml"
-    path: ./Rules/Google FCM
-    interval: 86400
-  Scholar:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Scholar.yaml"
-    path: ./Rules/Scholar
-    interval: 86400
-  miHoYo:
-    type: "http"
-    behavior: "classical"
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/miHoYo.yaml"
-    path: ./Rules/miHoYo
-    interval: 86400
-`;
+// Default YAML content — loaded from server at /head.yaml and /rules.yaml
+const DEFAULT_HEAD = '';
+const DEFAULT_RULES = '';
 
 // ─────────────────────────────────────────
 // Load yaml files from server (fallback to empty)
@@ -472,9 +26,37 @@ async function loadYamlDefaults() {
 // ─────────────────────────────────────────
 // State
 // ─────────────────────────────────────────
-let rawProxies = [];      // 订阅节点
-let manualProxies = [];   // 手动输入节点（始终在前面）
+let subscriptions = [];   // [{ url, prefix, proxies }]
+let manualProxies = [];   // 手动输入节点（始终在最前）
 let mergedConfig = null;
+let _ignoreInput = false;
+
+// 总订阅节点数（避免多处重复 reduce）
+function subProxyCount() {
+  return subscriptions.reduce((s, sub) => s + sub.proxies.length, 0);
+}
+
+// HTML 转义（防止 XSS）
+const _HTML_ESCAPE_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, c => _HTML_ESCAPE_MAP[c]);
+}
+
+// 解析 textarea 文本为订阅数组
+function parseSubLines(text) {
+  return text.split('\n')
+    .map(l => l.trim())
+    .filter(Boolean)
+    .map(line => {
+      const sepIdx = line.indexOf('|');
+      if (sepIdx === -1) return null;
+      const prefix = line.slice(0, sepIdx);
+      const url = line.slice(sepIdx + 1).trim();
+      if (!url || !/^https?:\/\//i.test(url)) return null;
+      return { url, prefix };
+    })
+    .filter(Boolean);
+}
 
 // ─────────────────────────────────────────
 // Panel collapse
@@ -515,26 +97,113 @@ function setProxyStatus(text, type = 'ok') {
   dot.className = `status-dot ${type}`;
   txt.className = `status-text ${type}`;
   txt.textContent = text;
-  document.getElementById('proxy-count-num').textContent = manualProxies.length + rawProxies.length;
+  const total = manualProxies.length + subProxyCount();
+  document.getElementById('proxy-count-num').textContent = total;
 }
 
 // ─────────────────────────────────────────
 // Fetch subscription
 // ─────────────────────────────────────────
-async function fetchSubscription() {
-  const url = document.getElementById('sub-url').value.trim();
-  if (!url) { showNotif('Enter a subscription URL first.', 'err'); return; }
+async function fetchAllSubscriptions() {
+  const textarea = document.getElementById('sub-urls');
+  const lines = parseSubLines(textarea.value);
 
-  setProxyStatus('Fetching...', 'warn');
+  if (!lines.length) { showNotif('Enter at least one subscription URL.', 'err'); return; }
 
-  try {
-    const r = await fetch(`/proxy?${encodeURIComponent(url)}`);
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    processYAML(decodeBase64(await r.text()));
-  } catch (e) {
-    setProxyStatus('CORS blocked', 'err');
-    showNotif('Could not fetch the URL. Try a CORS proxy or paste content manually.', 'err');
+  const btn = document.getElementById('btn-fetch-all');
+  btn.disabled = true;
+  btn.textContent = 'Fetching...';
+
+  subscriptions = []; // 用 textarea 最新内容替换
+  let successCount = 0;
+  let failCount = 0;
+
+  for (const { url, prefix } of lines) {
+    try {
+      const r = await fetch(`/proxy?${encodeURIComponent(url)}`);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const text = decodeBase64(await r.text());
+      const proxies = parseProxies(text);
+      subscriptions.push({ url, prefix, proxies, rawYaml: text });
+      successCount++;
+    } catch (e) {
+      failCount++;
+    }
   }
+
+  btn.disabled = false;
+  btn.textContent = '▶ Fetch All';
+
+  const subCount = subProxyCount();
+  const total = manualProxies.length + subCount;
+  if (failCount === 0) {
+    setProxyStatus(`Total: ${total} (manual: ${manualProxies.length}, subs: ${subCount})`, 'ok');
+    showNotif(`Fetched ${successCount} subscription(s), ${total} proxies total`, 'ok');
+  } else {
+    setProxyStatus(`Total: ${total} (manual: ${manualProxies.length}, subs: ${subCount})`, 'warn');
+    showNotif(`Fetched ${successCount}, failed ${failCount} subscription(s)`, 'warn');
+  }
+
+  renderSubscriptionList();
+  saveState();
+  refreshPreview();
+}
+
+function parseProxies(text) {
+  const doc = jsyaml.load(text, { schema: jsyaml.DEFAULT_SCHEMA, merge: true });
+  const proxies = Array.isArray(doc) ? doc : (Array.isArray(doc.proxies) ? doc.proxies : []);
+  if (!proxies.length) throw new Error('No proxies found.');
+  return proxies;
+}
+
+function toggleRaw(i) {
+  const el = document.getElementById('raw-' + i);
+  if (!el) return;
+  const hidden = el.style.display === 'none';
+  el.style.display = hidden ? 'block' : 'none';
+  const btn = document.getElementById('raw-toggle-' + i);
+  if (btn) btn.textContent = hidden ? 'Hide' : 'Raw';
+}
+
+function removeSubscription(index) {
+  subscriptions.splice(index, 1);
+  renderSubscriptionList();
+  const subCount = subProxyCount();
+  const total = manualProxies.length + subCount;
+  setProxyStatus(`Total: ${total} (manual: ${manualProxies.length}, subs: ${subCount})`, 'ok');
+  saveState();
+  refreshPreview();
+}
+
+function renderSubscriptionList() {
+  const container = document.getElementById('sub-list');
+  if (!container) return;
+
+  if (!subscriptions.length) {
+    container.innerHTML = '<div class="sub-list-empty">No subscriptions added</div>';
+    return;
+  }
+
+  container.innerHTML = subscriptions.map((sub, i) => {
+    const safeUrl = escapeHtml(sub.url);
+    const urlShort = safeUrl.length > 45 ? safeUrl.slice(0, 42) + '...' : safeUrl;
+    const safePrefix = escapeHtml(sub.prefix);
+    const rawSafe = escapeHtml(sub.rawYaml || '');
+    return `
+      <div class="sub-item">
+        <div class="sub-item-info">
+          <span class="sub-prefix">${safePrefix || '<span class="sub-no-prefix">—</span>'}</span>
+          <span class="sub-count">${sub.proxies.length}</span>
+          <span class="sub-url" title="${safeUrl}">${urlShort}</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="toggleRaw(${i})" id="raw-toggle-${i}">Raw</button>
+        <button class="btn btn-danger btn-sm" onclick="removeSubscription(${i})">&#10005;</button>
+      </div>
+      <div class="sub-raw" id="raw-${i}" style="display:none">
+        <pre>${rawSafe}</pre>
+      </div>
+    `;
+  }).join('');
 }
 
 // ─────────────────────────────────────────
@@ -544,15 +213,16 @@ function parseManualInput() {
   const text = document.getElementById('manual-yaml').value.trim();
   if (!text) { showNotif('Paste some node names or YAML first.', 'err'); return; }
 
-  // 有 - name: -> 解析节点列表存入 manualProxies
   if (text.includes('- name:')) {
     try {
-      const doc = jsyaml.load(text, { schema: jsyaml.DEFAULT_SCHEMA, merge: true });
-      const list = Array.isArray(doc) ? doc : (Array.isArray(doc.proxies) ? doc.proxies : []);
+      const list = parseProxies(text);
       if (!list.length) { showNotif('No proxies found.', 'err'); return; }
       manualProxies = list;
-      setProxyStatus(`Manual: ${manualProxies.length} proxies`, 'ok');
-      showNotif(`Manual: ${manualProxies.length} proxies`, 'ok');
+      const subCount = subProxyCount();
+      const total = manualProxies.length + subCount;
+      setProxyStatus(`Total: ${total} (manual: ${manualProxies.length}, subs: ${subCount})`, 'ok');
+      showNotif(`Manual: ${manualProxies.length} proxies, Total: ${total}`, 'ok');
+      refreshPreview();
     } catch (e) { showNotif(e.message, 'err'); }
   }
 }
@@ -572,23 +242,6 @@ function decodeBase64(str) {
 }
 
 // ─────────────────────────────────────────
-// Process decoded YAML → extract proxies + groups (订阅专用)
-// ─────────────────────────────────────────
-function processYAML(text) {
-  const doc = jsyaml.load(text, { schema: jsyaml.DEFAULT_SCHEMA, merge: true });
-  const proxies = Array.isArray(doc.proxies) ? doc.proxies : [];
-
-  if (!proxies.length) throw new Error('No proxies found.');
-
-  rawProxies = proxies;
-
-  const total = manualProxies.length + rawProxies.length;
-  setProxyStatus(`Total: ${total} (manual: ${manualProxies.length}, sub: ${rawProxies.length})`, 'ok');
-  showNotif(`Subscription: ${rawProxies.length} proxies, Total: ${total}`, 'ok');
-  refreshPreview();
-}
-
-// ─────────────────────────────────────────
 // Compress proxy to single line (YAML flow style)
 // ─────────────────────────────────────────
 function compressValue(v) {
@@ -600,24 +253,50 @@ function compressValue(v) {
     return v;
   }
   if (typeof v === 'boolean' || typeof v === 'number') return String(v);
+  return undefined; // 数组/对象由 jsyaml.dump 自然处理，保留多行格式；空数组返回 null 以便过滤
+}
+
+function compressProxyValue(v) {
+  if (v === null || v === undefined) return null;
+  if (typeof v === 'string') {
+    if (/[:\[\]{},#&*!|>'"%@`]/.test(v) || /^\s/.test(v) || /\s$/.test(v)) {
+      return `"${v.replace(/"/g, '\\"')}"`;
+    }
+    return v;
+  }
+  if (typeof v === 'boolean' || typeof v === 'number') return String(v);
   if (Array.isArray(v)) {
-    const items = v.map(compressValue).filter(x => x !== null);
+    const items = v.map(compressProxyValue).filter(x => x !== null);
     return `[${items.join(', ')}]`;
   }
   if (typeof v === 'object') {
     const pairs = Object.entries(v)
       .filter(([, val]) => val !== undefined && val !== null)
-      .map(([k, val]) => `${k}: ${compressValue(val)}`);
+      .map(([k, val]) => `${k}: ${compressProxyValue(val)}`);
     return `{${pairs.join(', ')}}`;
   }
-  return String(v);
+  return null;
 }
 
 function compressProxy(proxy) {
   const pairs = Object.entries(proxy)
     .filter(([, v]) => v !== null && v !== undefined)
-    .map(([k, v]) => `${k}: ${compressValue(v)}`);
+    .map(([k, v]) => `${k}: ${compressProxyValue(v)}`);
   return `- {${pairs.join(', ')}}`;
+}
+
+function compressRuleProvider(name, rp) {
+  const pairs = Object.entries(rp)
+    .filter(([, v]) => v !== null && v !== undefined)
+    .map(([k, v]) => `${k}: ${compressProxyValue(v)}`);
+  return `  ${name}: {${pairs.join(', ')}}`;
+}
+
+
+function dumpListYaml(key, arr) {
+  const lines = [`${key}:`];
+  for (const v of arr) lines.push(`  - ${compressValue(v)}`);
+  return lines.join('\n');
 }
 
 // ─────────────────────────────────────────
@@ -672,7 +351,14 @@ function buildMergedConfig() {
   const head   = parseYamlSafe(window._cmContent['editor-head']   || '{}');
   const rules  = parseYamlSafe(window._cmContent['editor-rules'] || '{}');
 
-  const finalProxies = [...manualProxies, ...rawProxies];
+  // 合并所有订阅节点，叠加前缀
+  const subProxies = subscriptions.flatMap(sub =>
+    sub.proxies.map(p => ({
+      ...p,
+      name: (sub.prefix ? sub.prefix + ' - ' : '') + (p.name || '')
+    }))
+  );
+  const finalProxies = [...manualProxies, ...subProxies];
   const proxyNames   = finalProxies.map(p => p.name);
 
   // 始终用 GROUP_TEMPLATES 生成 proxy-groups，忽略订阅中的 rawGroups
@@ -702,8 +388,8 @@ function dumpConfigYaml(config) {
 
   const lines = [];
 
-  // 1. Head_dns 内容 (不含 rules 和 rule-providers)
-  const headYaml = jsyaml.dump(headRest, { indent: 2, lineWidth: -1, noRefs: true, sortKeys: false });
+  // 1. Head 内容 (不含 rules 和 rule-providers)
+  const headYaml = jsyaml.dump(headRest, { indent: 2, noRefs: true, sortKeys: false });
   if (headYaml.trim()) lines.push(headYaml.trim());
 
   // 2. proxies (压缩单行)
@@ -726,11 +412,18 @@ function dumpConfigYaml(config) {
   }
 
   // 4. rules 内容 (rules, rule-providers)
-  const rulesContent = {};
-  if (rules) rulesContent.rules = rules;
-  if (ruleProviders) rulesContent['rule-providers'] = ruleProviders;
-  const rulesYaml = jsyaml.dump(rulesContent, { indent: 2, lineWidth: -1, noRefs: true, sortKeys: false });
-  if (rulesYaml.trim()) lines.push(rulesYaml.trim());
+  if (rules && rules.length) {
+    lines.push('rules:');
+    for (const r of rules) lines.push(`  - "${r}"`);
+  }
+
+  // 5. rule-providers (每条单行)
+  if (ruleProviders && Object.keys(ruleProviders).length) {
+    lines.push('rule-providers:');
+    for (const [name, rp] of Object.entries(ruleProviders)) {
+      lines.push(compressRuleProvider(name, rp));
+    }
+  }
 
   return lines.join('\n');
 }
@@ -758,7 +451,8 @@ function refreshPreview() {
   window._cmPreview.dispatch({
     changes: { from: 0, to: window._cmPreview.state.doc.length, insert: yaml }
   });
-  document.getElementById('proxy-count-num').textContent = manualProxies.length + rawProxies.length;
+  const subCount = subProxyCount();
+  document.getElementById('proxy-count-num').textContent = manualProxies.length + subCount;
 }
 
 // ─────────────────────────────────────────
@@ -854,11 +548,14 @@ function expandEditor(id, label, view) {
 const LS_KEY = 'rcg_state';
 
 function saveState() {
-  localStorage.setItem(LS_KEY, JSON.stringify({
-    subUrl: document.getElementById('sub-url').value,
-    manualYaml: document.getElementById('manual-yaml').value,
-    activeTab: document.getElementById('tab-url').classList.contains('active') ? 'url' : 'manual',
-  }));
+  try {
+    if (_ignoreInput) return;
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      subUrls: (document.getElementById('sub-urls') || {}).value || '',
+      manualYaml: (document.getElementById('manual-yaml') || {}).value || '',
+      activeTab: document.getElementById('tab-url').classList.contains('active') ? 'url' : 'manual',
+    }));
+  } catch (_) {}
 }
 
 function loadState() {
@@ -866,9 +563,21 @@ function loadState() {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return;
     const s = JSON.parse(raw);
-    if (s.subUrl)    document.getElementById('sub-url').value = s.subUrl;
-    if (s.manualYaml) document.getElementById('manual-yaml').value = s.manualYaml;
+
+    const subEl = document.getElementById('sub-urls');
+    if (subEl && s.subUrls !== undefined) {
+      try {
+        _ignoreInput = true;
+        subEl.value = s.subUrls;
+      } finally {
+        _ignoreInput = false;
+      }
+    }
+
+    const manualEl = document.getElementById('manual-yaml');
+    if (manualEl && s.manualYaml !== undefined) manualEl.value = s.manualYaml;
     if (s.activeTab) switchTab(s.activeTab);
+    // 节点数据未缓存，subscriptions 保持为空，用户需重新 Fetch
   } catch (_) {}
 }
 
@@ -953,10 +662,13 @@ async function init() {
     parent: document.getElementById('preview-output'),
   });
 
-  // 订阅 URL 输入保存
-  document.getElementById('sub-url').addEventListener('input', saveState);
+  // 订阅输入保存
+  document.getElementById('sub-urls').addEventListener('input', () => {
+    if (!_ignoreInput) saveState();
+  });
 
   loadState();
+  renderSubscriptionList();
   refreshPreview();
 }
 

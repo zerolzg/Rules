@@ -43,14 +43,15 @@
         </div>
 
         <div class="url-input-wrap active" id="input-url">
-          <input type="text" id="sub-url" placeholder="https://example.com/clash/proxies" spellcheck="false">
           <div class="input-hint">
-            Paste your Clash subscription URL. Content is base64-decoded automatically.<br>
+            One subscription per line: <code>前缀|URL</code>（前缀留空则无前缀，如 <code>🇭🇰|https://...</code> 或 <code>|https://...</code>）<br>
             <span style="color:var(--yellow)">&#9888; Requires <code>node proxy.js</code> running at http://localhost:5555</span>
           </div>
+          <textarea id="sub-urls" placeholder="🇭🇰|https://example.com/clash/proxies1&#10;🇺🇸|https://example.com/clash/proxies2" spellcheck="false"></textarea>
           <div class="btn-row">
-            <button class="btn btn-secondary" onclick="fetchSubscription()">&#9654; Fetch &amp; Decode</button>
+            <button class="btn btn-secondary" id="btn-fetch-all" onclick="fetchAllSubscriptions()">&#9654; Fetch All</button>
           </div>
+          <div id="sub-list"></div>
         </div>
 
         <div class="url-input-wrap" id="input-manual">
