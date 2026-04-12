@@ -10,7 +10,6 @@ payload:
   - DOMAIN-SUFFIX,bilivideo.com
   - DOMAIN-SUFFIX,hdslb.com
   - DOMAIN,upos-hz-mirrorakam.akamaized.net
-  - DOMAIN,apiintl.biliapi.net
   - PROCESS-NAME,com.bilibili.app.blue
   - PROCESS-NAME,com.bilibili.app.in
   - PROCESS-NAME,com.bilibili.comic

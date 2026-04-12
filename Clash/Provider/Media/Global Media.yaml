@@ -11,8 +11,7 @@ payload:
   - PROCESS-NAME,com.disney.disneyplus
   - DOMAIN-SUFFIX,cdn.registerdisney.go.com
   - DOMAIN-SUFFIX,disney-plus.net
-  - DOMAIN-SUFFIX,disney.api.edge.bamgrid.com
-  - DOMAIN-SUFFIX,disney.connections.edge.bamgrid.com
+  - DOMAIN-SUFFIX,bamgrid.com
   - DOMAIN-SUFFIX,disneynow.com
   - DOMAIN-SUFFIX,disneyplus.com
   - DOMAIN-SUFFIX,disneystreaming.com
@@ -210,7 +209,6 @@ payload:
   - DOMAIN,kpck4q-launches.appsflyersdk.com
   - DOMAIN,kpck4q-skadsdkless.appsflyersdk.com
   - DOMAIN,o0137140.ingest.us.sentry.io
-  - DOMAIN,out053a3bejgh7t0phqa0csou.litix.io
   - DOMAIN,sdk.iad-01.braze.com
   - DOMAIN-SUFFIX,branch.io
   # > TikTok
@@ -274,7 +272,6 @@ payload:
   - DOMAIN-SUFFIX,bbc.co
   - DOMAIN-SUFFIX,bbc.co.uk
   - DOMAIN-SUFFIX,bbc.com
-  - DOMAIN-SUFFIX,bbcfmt.hs.llnwd.net
   - DOMAIN-SUFFIX,bbci.co
   - DOMAIN-SUFFIX,bbci.co.uk
   - DOMAIN-SUFFIX,bidi.net.uk
@@ -293,7 +290,6 @@ payload:
   - DOMAIN-SUFFIX,dc2voddazn.akamaized.net
   # > Discovery Plus
   - PROCESS-NAME,com.discovery.discoveryplus.mobile
-  - DOMAIN-SUFFIX,content-ause1-ur-discovery1.uplynk.com
   - DOMAIN-SUFFIX,disco-api.com
   - DOMAIN-SUFFIX,discoveryplus.com
   - DOMAIN-SUFFIX,fwmrm.net
@@ -309,7 +305,6 @@ payload:
   # > F1 TV
   - DOMAIN,d2n9h2wits23hf.cloudfront.net
   - DOMAIN,f1prodlive.akamaized.net
-  - DOMAIN,mobile-collector.newrelic.com
   - DOMAIN-SUFFIX,bitmovin.com
   - DOMAIN-SUFFIX,f1esports.com
   - DOMAIN-SUFFIX,f1manager.com

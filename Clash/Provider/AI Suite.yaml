@@ -3,18 +3,11 @@ payload:
   - DOMAIN-SUFFIX,augment.com
   - DOMAIN-SUFFIX,augmentcode.com
 
-  # > ChatGPT
+  # > ChatGPT & OpenAI
+  - DOMAIN-KEYWORD,openai
   - DOMAIN-SUFFIX,ai.com
   - DOMAIN-SUFFIX,chatgpt.com
-  - DOMAIN-SUFFIX,openai.com
-
-  # > Chat GPT API & CDN
-  - DOMAIN,chat.openai.com.cdn.cloudflare.net
-  - DOMAIN,openaiapi-site.azureedge.net
-  - DOMAIN,openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net
-  - DOMAIN,openaicomproductionae4b.blob.core.windows.net
-  - DOMAIN,production-openaicom-storage.azureedge.net
-  - DOMAIN-SUFFIX,cdn.oaistatic.com
+  - DOMAIN-SUFFIX,oaistatic.com
   - DOMAIN-SUFFIX,oaiusercontent.com
   - DOMAIN,o33249.ingest.sentry.io
 
@@ -25,7 +18,7 @@ payload:
   - DOMAIN-SUFFIX,chorus.sh
 
   # > Claude
-  - DOMAIN-SUFFIX,anthropic.com
+  - DOMAIN-KEYWORD,anthropic
   - DOMAIN-SUFFIX,claude.ai
   - DOMAIN-SUFFIX,claude.com
   - DOMAIN-SUFFIX,claudeusercontent.com
@@ -33,10 +26,16 @@ payload:
   # > Cloudflare AI Gateway
   - DOMAIN,gateway.ai.cloudflare.com
 
-  # > Copilot
+  # > Copilot & GitHub Copilot
   - DOMAIN-SUFFIX,githubcopilot.com
   - DOMAIN-SUFFIX,microsoftonline.com
+  - DOMAIN-SUFFIX,copilot.cloud.microsoft
+  - DOMAIN-SUFFIX,client-api.arkoselabs.com
+  - DOMAIN-SUFFIX,events.statsigapi.net
+  - DOMAIN-SUFFIX,featuregates.org
   - DOMAIN,copilot.microsoft.com
+  - DOMAIN,api.github.com
+  - DOMAIN,copilot-proxy.githubusercontent.com
 
   # > Cursor
   - DOMAIN-SUFFIX,cursor.sh
@@ -47,38 +46,24 @@ payload:
   # > Dify.AI
   - DOMAIN-SUFFIX,dify.ai
 
-  # > GitHub Copilot
-  - DOMAIN,api.github.com
-
-  # > Google AI Studio
-  - DOMAIN-KEYWORD,alkalimakersuite-pa.clients6.google.com
+  # > Google AI
   - DOMAIN-SUFFIX,aistudio.google.com
   - DOMAIN-SUFFIX,makersuite.google.com
-  - DOMAIN-SUFFIX,generativeai.google
-  - DOMAIN,ai.google.dev
-  - DOMAIN,alkalicore-pa.clients6.google.com
-  - DOMAIN,waa-pa.clients6.google.com
-
-  # > Google DeepMind
   - DOMAIN-SUFFIX,deepmind.com
   - DOMAIN-SUFFIX,deepmind.google
-
-  # > Google Generative Language API
   - DOMAIN-SUFFIX,generativelanguage.googleapis.com
   - DOMAIN-SUFFIX,geller-pa.googleapis.com
   - DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com
-
-  # > Google Gemini
+  - DOMAIN-SUFFIX,generativeai.google
   - DOMAIN-SUFFIX,aisandbox-pa.googleapis.com
   - DOMAIN-SUFFIX,apis.google.com
   - DOMAIN-SUFFIX,bard.google.com
   - DOMAIN-SUFFIX,gemini.google
-  - DOMAIN-SUFFIX,gemini.google.com
-  - DOMAIN-SUFFIX,robinfrontend-pa.googleapis.com
-
-  # > Google NotebookLM
   - DOMAIN-SUFFIX,notebooklm.google
-  - DOMAIN-SUFFIX,notebooklm.google.com
+  - DOMAIN,ai.google.dev
+  - DOMAIN,alkalicore-pa.clients6.google.com
+  - DOMAIN,waa-pa.clients6.google.com
+  - DOMAIN,alkalimakersuite-pa.clients6.google.com
 
   # > Grok
   - DOMAIN-SUFFIX,x.ai
@@ -96,6 +81,9 @@ payload:
 
   # > Meta AI
   - DOMAIN-SUFFIX,meta.ai
+
+  # > Mistral AI
+  - DOMAIN-SUFFIX,mistral.ai
 
   # > OpenArt
   - DOMAIN-SUFFIX,openart.ai
@@ -120,7 +108,6 @@ payload:
 
   # > Sora
   - DOMAIN-SUFFIX,sora.com
-  - DOMAIN,sora-cdn.oaistatic.com
 
   # > TRAE
   - DOMAIN-SUFFIX,trae.ai
@@ -133,3 +120,9 @@ payload:
 
   # > Zed
   - DOMAIN-SUFFIX,zed.dev
+
+  # > Others
+  - DOMAIN-SUFFIX,auth0.com
+  - DOMAIN-SUFFIX,identrust.com
+  - DOMAIN,api.together.xyz
+  - DOMAIN,sydney.bing.com

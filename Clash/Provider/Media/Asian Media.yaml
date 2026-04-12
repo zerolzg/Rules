@@ -7,20 +7,14 @@ payload:
   - DOMAIN-SUFFIX,abema.tv
   - DOMAIN-SUFFIX,ameba.jp
   - DOMAIN-SUFFIX,bucketeer.jp
-  - DOMAIN-SUFFIX,ds-linear-abematv.akamaized.net
-  - DOMAIN-SUFFIX,ds-vod-abematv.akamaized.net
   - DOMAIN-SUFFIX,hayabusa.io
   - DOMAIN-SUFFIX,hayabusa.media
-  - DOMAIN-SUFFIX,linear-abematv.akamaized.net
-  - DOMAIN-SUFFIX,vod-abematv.akamaized.net
-  - DOMAIN-SUFFIX,vod-playout-abematv.akamaized.net
   # > Bahamut
   - PROCESS-NAME,tw.com.gamer.android.animad
   - DOMAIN-SUFFIX,bahamut.com.tw
   - DOMAIN-SUFFIX,gamer.com.tw
   - DOMAIN,gamer-cds.cdn.hinet.net
   - DOMAIN,gamer2-cds.cdn.hinet.net
-  - DOMAIN,bahamut.akamaized.net
   # > DMM
   - DOMAIN-SUFFIX,dmm-extension.com
   - DOMAIN-SUFFIX,dmm.co.jp
@@ -28,7 +22,6 @@ payload:
   - DOMAIN-SUFFIX,img.vm-movie.jp
   - DOMAIN-SUFFIX,p-smith.com
   - DOMAIN-SUFFIX,videomarket.jp
-  - DOMAIN-SUFFIX,vmdash-cenc.akamaized.net
   # > Fox+
   - DOMAIN-SUFFIX,akamaized.net
   - DOMAIN-SUFFIX,foxplus.com
@@ -63,14 +56,6 @@ payload:
   # > Japonx
   - DOMAIN-KEYWORD,japonx
   - DOMAIN-KEYWORD,japronx
-  - DOMAIN-SUFFIX,japonx.com
-  - DOMAIN-SUFFIX,japonx.tv
-  - DOMAIN-SUFFIX,japonx.net
-  - DOMAIN-SUFFIX,japonx.vip
-  - DOMAIN-SUFFIX,japronx.com
-  - DOMAIN-SUFFIX,japronx.tv
-  - DOMAIN-SUFFIX,japronx.net
-  - DOMAIN-SUFFIX,japronx.vip
   # > JOOX
   - PROCESS-NAME,com.tencent.ibg.joox
   - PROCESS-NAME,com.tencent.ibg.jooxtv
@@ -86,7 +71,6 @@ payload:
   - DOMAIN-SUFFIX,kktv.com.tw
   - DOMAIN,kktv-theater.kk.stream
   # > Line TV
-  - DOMAIN-SUFFIX,d3c7rimkq79yfu.cloudfront.net
   - DOMAIN-SUFFIX,linetv.tw
   - DOMAIN-SUFFIX,profile.line-scdn.net
   # > myTV SUPER
