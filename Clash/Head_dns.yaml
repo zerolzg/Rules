@@ -11,7 +11,7 @@ experimental:
   ignore-resolve-fail: true
 
 # Clash for Windows
-cfw-latency-url: http://cp.cloudflare.com/generate_204
+cfw-latency-url: https://cp.cloudflare.com/generate_204
 cfw-latency-timeout: 3000
 cfw-latency-type: 1
 cfw-conn-break-strategy: true
@@ -33,22 +33,143 @@ dns:
   fake-ip-range: 198.18.0.1/16
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
+    # 通配符
+    - "*"
+    - "*.lan"
+    - "*.localdomain"
+    - "*.example"
+    - "*.invalid"
+    - "*.localhost"
+    - "*.test"
+    - "*.local"
+    - "*.home.arpa"
+    - "*.direct"
+    # NTP 时间同步
+    - "time.*.com"
+    - "time.*.gov"
+    - "time.*.edu.cn"
+    - "time-ios.apple.com"
+    - "time1.*.com"
+    - "time2.*.com"
+    - "time3.*.com"
+    - "time4.*.com"
+    - "time5.*.com"
+    - "time6.*.com"
+    - "time7.*.com"
+    - "ntp.*.com"
+    - "ntp1.*.com"
+    - "ntp2.*.com"
+    - "ntp3.*.com"
+    - "ntp4.*.com"
+    - "ntp5.*.com"
+    - "ntp6.*.com"
+    - "ntp7.*.com"
+    - "*.time.edu.cn"
+    - "*.ntp.org.cn"
+    - "+.pool.ntp.org"
+    - "time1.cloud.tencent.com"
+    # 国内音乐服务
+    - "music.163.com"
+    - "*.music.163.com"
+    - "*.126.net"
+    - "musicapi.taihe.com"
+    - "music.taihe.com"
+    - "songsearch.kugou.com"
+    - "trackercdn.kugou.com"
+    - "*.kuwo.cn"
+    - "api-jooxtt.sanook.com"
+    - "api.joox.com"
+    - "joox.com"
+    - "y.qq.com"
+    - "*.y.qq.com"
+    - "streamoc.music.tc.qq.com"
+    - "mobileoc.music.tc.qq.com"
+    - "isure.stream.qqmusic.qq.com"
+    - "dl.stream.qqmusic.qq.com"
+    - "aqqmusic.tc.qq.com"
+    - "amobile.music.tc.qq.com"
+    - "*.xiami.com"
+    - "*.music.migu.cn"
+    - "music.migu.cn"
+    # 系统与网络服务
+    - "+.msftconnecttest.com"
+    - "+.msftncsi.com"
+    - "localhost.ptlogin2.qq.com"
+    - "localhost.sec.qq.com"
+    - "localhost.*.weixin.qq.com"
+    - "+.kk-rays.com"
+    - "+.steamcontent.com"
+    - "+.srv.nintendo.net"
+    - "*.n.n.srv.nintendo.net"
+    - "+.cdn.nintendo.net"
+    - "xbox.*.*.microsoft.com"
+    - "*.*.xboxlive.com"
+    - "xbox.*.microsoft.com"
+    - "xnotify.xboxlive.com"
+    - "+.battle.net"
+    - "+.battlenet.com.cn"
+    - "+.wotgame.cn"
+    - "+.wggames.cn"
+    - "+.wowsgame.cn"
+    - "+.wargaming.net"
+    - "proxy.golang.org"
+    - "+.stun.*.*"
+    - "+.stun.*.*.*"
+    - "+.stun.*.*.*.*"
+    - "+.stun.*.*.*.*.*"
+    - "heartbeat.belkin.com"
+    - "*.linksys.com"
+    - "*.linksyssmartwifi.com"
+    - "*.router.asus.com"
+    - "mesu.apple.com"
+    - "swscan.apple.com"
+    - "swquery.apple.com"
+    - "swdownload.apple.com"
+    - "swcdn.apple.com"
+    - "swdist.apple.com"
+    - "lens.l.google.com"
+    - "na.b.g-tun.com"
+    # 游戏服务
+    - "*.square-enix.com"
+    - "*.finalfantasyxiv.com"
+    - "*.ffxiv.com"
+    - "*.ff14.sdo.com"
+    - "ff.dorado.sdo.com"
+    - "*.mcdn.bilivideo.cn"
+    - "+.media.dssott.com"
+    - "shark007.net"
+    - "Mijia Cloud"
+    # 其他服务
+    - "+.market.xiaomi.com"
+    - "+.cmbchina.com"
+    - "+.cmbimg.com"
+    - "adguardteam.github.io"
+    - "adrules.top"
+    - "anti-ad.net"
+    - "local.adguard.org"
+    - "static.adtidy.org"
+    - "+.sandai.net"
+    - "+.n0808.com"
+    - "+.3gppnetwork.org"
+    - "+.uu.163.com"
+    - "ps.res.netease.com"
+    - "+.pub.3gppnetwork.org"
+    - "+.oray.com"
+    - "+.orayimg.com"
+    - "+.gcloudcs.com"
+    - "+.gcloudsdk.com"
+    - "+.dynv6.net"
+    # 内网与保留地址
     - "*.lan"
     - "*.local"
     - "*.arpa"
-    - "time.*.com"
-    - "time.*.gov"
-    - "ntp.*.com"
     - "*.ntp.org"
     - "*.ip6.arpa"
     - "isatap"
     - "teredo.ipv6.microsoft.com"
-    - "+.market.xiaomi.com"
-    - "localhost.ptlogin2.qq.com"
-    - "*.msftncsi.com"
-    - "www.msftconnecttest.com"
     - "*.apple.com"
     - "captive.apple.com"
+    - "www.msftconnecttest.com"
   default-nameserver:
     - 223.5.5.5
     - 119.29.29.29
@@ -61,11 +182,9 @@ dns:
     "geosite:cn,private":
       - https://doh.pub/dns-query
       - https://dns.alidns.com/dns-query
-  proxy-server-nameserver:
-    - https://doh.pub/dns-query
-    - https://dns.alidns.com/dns-query
-    - 140.205.1.13
-    - 124.221.68.73:1053
+    "+.cloud-nodes.com":
+      - 140.205.1.13
+      - 124.221.68.73:1053
   fallback: []
   fallback-filter:
     geoip: false
@@ -80,9 +199,11 @@ dns:
       - "::1/128"
       - "fe80::/10"
       - "64:ff9b::/96"
-  direct-nameserver: []
+  direct-nameserver:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
   direct-nameserver-follow-policy: false
-  respect-rules: true
+  respect-rules: false
   prefer-h3: false
   use-hosts: false
   use-system-hosts: false

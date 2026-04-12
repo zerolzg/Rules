@@ -1,3 +1,19 @@
+# =============================================
+# 编辑提示
+# =============================================
+# rule-providers:
+#   - behavior: classical (普通域名/IP规则)
+#   - behavior: domain (精确域名匹配, 效率更高)
+#   - behavior: ipcidr (IP段匹配)
+#
+# rules:
+#   - 规则类型: 匹配内容, 策略组
+#   - 常用类型: RULE-SET, DOMAIN, DOMAIN-SUFFIX, DOMAIN-KEYWORD, GEOIP, GEOSITE, IP-CIDR, AND, PROCESS-NAME
+#   - 策略组名称必须与 Proxy Groups 中定义的名称完全一致
+#   - 越靠前的规则优先级越高
+#   - 新增 provider 后，必须同步在 rule-providers 中添加 url 和 path
+# =============================================
+
 rules:
   # 拦截 QUIC 流量功能（强制谷歌/YouTube回退到TCP，防降速）
   - AND,((NETWORK,UDP),(DST-PORT,443)),REJECT

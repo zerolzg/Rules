@@ -382,7 +382,7 @@ const GROUP_TEMPLATES = [
     type: "url-test",
     proxies: [],
     match: "",
-    url: "http://cp.cloudflare.com/generate_204",
+    url: "https://cp.cloudflare.com/generate_204",
     interval: 3600,
   },
 ];
