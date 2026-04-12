@@ -89,15 +89,12 @@ payload:
   - DOMAIN-SUFFIX,huobigroup.com
   - DOMAIN-SUFFIX,huobitoken.com
   - DOMAIN-SUFFIX,heco-scan.com
-  - DOMAIN-SUFFIX,hecoview.com
-  - DOMAIN-SUFFIX,hbfile.net
   - DOMAIN-SUFFIX,huobi.br.com
   - DOMAIN-SUFFIX,bitderiv.com
   - DOMAIN-SUFFIX,hecochain.com
   - DOMAIN-SUFFIX,huobi.ws
   - DOMAIN-SUFFIX,huobi.ug
   - DOMAIN-SUFFIX,huobi.co.ma
-  - DOMAIN-SUFFIX,huobi.br.com
   - PROCESS-NAME,Huobi.exe
   - DOMAIN-KEYWORD,huobi
 
@@ -121,7 +118,6 @@ payload:
   - DOMAIN-SUFFIX,bitsquare.io
       
   # > coinone
-  - DOMAIN-SUFFIX,coinone.co.kr
   - DOMAIN-SUFFIX,coinonecore.com
   - DOMAIN-SUFFIX,coinonecorp.com
       
@@ -135,9 +131,7 @@ payload:
   - DOMAIN-SUFFIX,watchtheburn.com
   - DOMAIN-SUFFIX,flashbots.net
   - DOMAIN-SUFFIX,cryptofees.info
-  - DOMAIN-SUFFIX,etherscan.io
   - DOMAIN-SUFFIX,ethereum-magicians.org
-  - DOMAIN-SUFFIX,vitalik.ca
   - DOMAIN-SUFFIX,ethfans.org
   - DOMAIN-SUFFIX,ethereum.cn
   - DOMAIN-SUFFIX,ethereum.stackexchange.com
@@ -181,10 +175,8 @@ payload:
   - DOMAIN-SUFFIX,defirate.com
   - DOMAIN-SUFFIX,defipulse.com
   - DOMAIN-SUFFIX,apy999.com
-  - DOMAIN-SUFFIX,defieye.io
   - DOMAIN-SUFFIX,dextools.io
   - DOMAIN-SUFFIX,tradingview.com
-  - DOMAIN-SUFFIX,dcabtc.com
   - DOMAIN-SUFFIX,chainalysis.com
   - DOMAIN-SUFFIX,cryptoquant.com
   - DOMAIN-SUFFIX,viewbase.com
@@ -198,11 +190,9 @@ payload:
   - DOMAIN-SUFFIX,tradeblock.com
   - DOMAIN-SUFFIX,nyctale.io
   - DOMAIN-SUFFIX,dovemetrics.com
-  - DOMAIN-SUFFIX,cryptorank.io
   - DOMAIN-SUFFIX,icodrops.com
   - DOMAIN-SUFFIX,chainbroker.io
   - DOMAIN-SUFFIX,crunchbase.com
-  - DOMAIN-SUFFIX,defillama.com
   - DOMAIN-SUFFIX,coinowo.com
   - DOMAIN-SUFFIX,earni.fi
   - DOMAIN-SUFFIX,dropsearn.com
@@ -263,12 +253,10 @@ payload:
   - DOMAIN-SUFFIX,lightning.engineering
   - DOMAIN-SUFFIX,lightning.community
   - DOMAIN-SUFFIX,acinq.co
-  - DOMAIN-SUFFIX,1ml.com
 
   # > Token
   - DOMAIN-SUFFIX,tokenpocket.pro
   - DOMAIN-SUFFIX,token.im
-  - DOMAIN-SUFFIX,phantom.app
   - DOMAIN-SUFFIX,tronlink.org
   - DOMAIN-SUFFIX,myetherwallet.com
   - DOMAIN-SUFFIX,jaxx.io

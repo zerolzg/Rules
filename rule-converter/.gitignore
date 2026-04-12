@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Generated config
+config.yaml
+
+# Logs
+*.log
+npm-debug.log*
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo

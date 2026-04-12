@@ -312,6 +312,21 @@ textarea { resize: vertical; min-height: 180px; tab-size: 2; }
   align-items: center;
   gap: 6px;
 }
+
+/* ─── Save Status ─── */
+#save-status {
+  font-size: 12px;
+  color: var(--text-muted);
+  min-width: 60px;
+}
+#save-status.dirty { color: var(--yellow); }
+#save-status.saved { color: var(--green); }
+
+/* ─── Button Loading ─── */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
 /* ─── NSP Table ─── */
@@ -494,4 +509,42 @@ textarea { resize: vertical; min-height: 180px; tab-size: 2; }
   padding: 12px 14px;
   background: var(--surface2);
   border-top: 1px solid var(--border);
+}
+
+/* ─── Subscription URL Panel ─── */
+.sub-url-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+#sub-url-input {
+  width: 100%;
+  font-size: 11px;
+  background: var(--bg);
+  cursor: pointer;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+#sub-url-input:focus { outline: none; }
+
+#qr-code {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+#qr-code svg { display: block; }
+
+.sub-url-note {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.sub-url-note code {
+  background: var(--surface2);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 10px;
 }

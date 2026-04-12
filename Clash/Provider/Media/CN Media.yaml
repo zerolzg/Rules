@@ -1,0 +1,77 @@
+payload:
+  # > Bilibili
+  - DOMAIN-SUFFIX,acg.tv
+  - DOMAIN-SUFFIX,acgvideo.com
+  - DOMAIN-SUFFIX,b23.tv
+  - DOMAIN-SUFFIX,bilibili.com
+  - DOMAIN-SUFFIX,bilibili.tv
+  - DOMAIN-SUFFIX,biliapi.net
+  - DOMAIN-SUFFIX,biliapi.com
+  - DOMAIN-SUFFIX,bilivideo.com
+  - DOMAIN-SUFFIX,hdslb.com
+  - DOMAIN,upos-hz-mirrorakam.akamaized.net
+  - DOMAIN,apiintl.biliapi.net
+  - PROCESS-NAME,com.bilibili.app.blue
+  - PROCESS-NAME,com.bilibili.app.in
+  - PROCESS-NAME,com.bilibili.comic
+  - PROCESS-NAME,com.bilibili.comic.intl
+  - PROCESS-NAME,tv.danmaku.bili
+  - PROCESS-NAME,tv.danmaku.bilibilihd
+  # > IQIYI
+  - DOMAIN-SUFFIX,71.am
+  - DOMAIN-SUFFIX,71.am.com
+  - DOMAIN-SUFFIX,71edge.com
+  - DOMAIN-SUFFIX,71edge.net
+  - DOMAIN-SUFFIX,aianno.cn
+  - DOMAIN-SUFFIX,aianno.com
+  - DOMAIN-SUFFIX,aiqiyicloud-mgmt.com
+  - DOMAIN-SUFFIX,aiqiyicloud.com
+  - DOMAIN-SUFFIX,aiqiyicloud.net
+  - DOMAIN-SUFFIX,baiying.com
+  - DOMAIN-SUFFIX,gitv.cn
+  - DOMAIN-SUFFIX,gitv.tv
+  - DOMAIN-SUFFIX,ibkstore.com
+  - DOMAIN-SUFFIX,iq.com
+  - DOMAIN-SUFFIX,iqiyi.com
+  - DOMAIN-SUFFIX,iqiyi.demo.uwp
+  - DOMAIN-SUFFIX,iqiyiedge.com
+  - DOMAIN-SUFFIX,iqiyiedge.net
+  - DOMAIN-SUFFIX,iqiyipic.com
+  - DOMAIN-SUFFIX,jiangbing.cn
+  - DOMAIN-SUFFIX,pps.tv
+  - DOMAIN-SUFFIX,ppsimg.com
+  - DOMAIN-SUFFIX,ppstream.cn
+  - DOMAIN-SUFFIX,ppstream.com
+  - DOMAIN-SUFFIX,ppstream.com.cn
+  - DOMAIN-SUFFIX,ppstream.net
+  - DOMAIN-SUFFIX,ppstream.net.cn
+  - DOMAIN-SUFFIX,ppsurl.com
+  - DOMAIN-SUFFIX,qiyi.cn
+  - DOMAIN-SUFFIX,qiyi.com
+  - DOMAIN-SUFFIX,qiyipic.com
+  - DOMAIN-SUFFIX,qy.com
+  - DOMAIN-SUFFIX,qy.net
+  - DOMAIN-SUFFIX,suike.cn
+  # > Letv
+  - DOMAIN-SUFFIX,api.mob.app.letv.com
+  # > Netease Music
+  - DOMAIN-SUFFIX,music.163.com
+  - DOMAIN-SUFFIX,music.126.net
+  # > Tencent Video
+  - DOMAIN-SUFFIX,v.smtcdns.com
+  - DOMAIN-SUFFIX,vv.video.qq.com
+  # > WeTV
+  - PROCESS-NAME,com.tencent.qqlivei18n
+  - DOMAIN-SUFFIX,wetv.vip
+  - DOMAIN-SUFFIX,wetvinfo.com
+  # > Youku
+  - DOMAIN-SUFFIX,soku.com
+  - DOMAIN-SUFFIX,youku.com
+  - DOMAIN-SUFFIX,ykimg.com
+  # > Douyin
+  - DOMAIN-SUFFIX,amemv.com
+  - DOMAIN-SUFFIX,ixigua.com
+  - DOMAIN-SUFFIX,ixiguavideo.com
+  - DOMAIN-SUFFIX,pstatp.com
+  - DOMAIN-SUFFIX,snssdk.com
+  - DOMAIN-SUFFIX,toutiao.com

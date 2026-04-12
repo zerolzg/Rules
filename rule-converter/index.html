@@ -17,6 +17,7 @@
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.1/dist/js-yaml.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -48,19 +49,13 @@
             <span style="color:var(--yellow)">&#9888; Requires <code>node proxy.js</code> running at http://localhost:5555</span>
           </div>
           <textarea id="sub-urls" placeholder="🇭🇰|https://example.com/clash/proxies1&#10;🇺🇸|https://example.com/clash/proxies2" spellcheck="false"></textarea>
-          <div class="btn-row">
-            <button class="btn btn-secondary" id="btn-fetch-all" onclick="fetchAllSubscriptions()">&#9654; Fetch All</button>
-          </div>
-          <div id="sub-list"></div>
+                    <div id="sub-list"></div>
         </div>
 
         <div class="url-input-wrap" id="input-manual">
           <textarea id="manual-yaml" placeholder="- name: &quot;🇲🇾 evoxt-MY&quot;&#10;  type: vless&#10;  server: ...&#10;- name: &quot;🇲🇾 evoxt-MY2&quot;&#10;  type: vless&#10;  ..." spellcheck="false"></textarea>
           <div class="input-hint">粘贴节点 YAML（含 <code>- name:</code>），或每行一个节点名</div>
-          <div class="btn-row">
-            <button class="btn btn-secondary" onclick="parseManualInput()">&#9654; 解析节点</button>
-          </div>
-        </div>
+                  </div>
 
         <div class="status-bar" id="proxy-status">
           <div class="status-dot" id="proxy-dot"></div>
@@ -106,12 +101,30 @@
         <div class="preview-wrap" id="preview-output"></div>
       </div>
       <div class="actions-bar">
-        <button class="btn btn-primary" onclick="downloadConfig()">&#9660; Download config.yaml</button>
-        <button class="btn btn-secondary" onclick="copyConfig()">&#128203; Copy</button>
-        <button class="btn btn-secondary" onclick="refreshPreview()">&#8635; Refresh</button>
+        <button class="btn btn-primary" id="btn-generate" onclick="generateConfig()">&#9654; 生成配置</button>
+        <button class="btn btn-secondary" id="btn-download" onclick="downloadConfig()">&#9660; Download</button>
+        <button class="btn btn-secondary" id="btn-copy" onclick="copyConfig()">&#128203; Copy</button>
+        <button class="btn btn-primary" id="btn-save" onclick="saveToServer()">&#128190; Save to Server</button>
+        <span id="save-status"></span>
         <span class="proxy-count" style="margin-left:auto;">
           proxies:&nbsp;<span class="n" id="proxy-count-num">0</span>
         </span>
+      </div>
+    </div>
+
+    <!-- Subscription URL -->
+    <div class="panel" id="panel-sub-url">
+      <div class="panel-header" onclick="togglePanel('panel-sub-url')">
+        <span class="panel-title">[&#9776;] Subscription URL</span>
+        <span class="panel-toggle">&#9660;</span>
+      </div>
+      <div class="panel-body">
+        <input type="text" id="sub-url-input" readonly placeholder="Save to server first to get URL" onclick="copySubUrl()" title="Click to copy">
+        <div id="qr-code"></div>
+        <div class="sub-url-note">
+          Fill this URL in your Clash client's subscription field.<br>
+          &#9888; Change <code>API_KEY</code> in <code>proxy.js</code> before deploying.
+        </div>
       </div>
     </div>
 
