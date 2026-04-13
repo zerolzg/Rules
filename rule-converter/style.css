@@ -18,6 +18,17 @@
   --text-dim:  #5c7080;
   --text-muted:#aab4be;
   --glow:      rgba(0,151,167,0.12);
+
+  /* Editor dark theme tokens — One Dark palette */
+  --editor-bg:      #282c34;
+  --editor-surface: #21252b;
+  --editor-border:  #3e4451;
+  --editor-text:    #abb2bf;
+  --editor-gutter:  #636d83;
+  --editor-active:  #2c313c;
+  --editor-sel:     #3e4451;
+  --editor-cursor:  #528bff;
+  --editor-bracket: #3e445166;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -233,8 +244,6 @@ textarea { resize: vertical; min-height: 180px; tab-size: 2; }
 }
 .btn-danger:hover { background: rgba(222,53,11,0.08); }
 
-.btn-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-
 /* ─── Subscription List ─── */
 .sub-list { margin-top: 4px; }
 .sub-list-empty {
@@ -300,19 +309,6 @@ textarea { resize: vertical; min-height: 180px; tab-size: 2; }
 }
 .btn-sm { padding: 3px 8px; font-size: 10px; }
 
-/* ─── Section Labels ─── */
-.section-label {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
 /* ─── Save Status ─── */
 #save-status {
   font-size: 12px;
@@ -323,28 +319,26 @@ textarea { resize: vertical; min-height: 180px; tab-size: 2; }
 #save-status.saved { color: var(--green); }
 
 /* ─── Button Loading ─── */
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ─── NSP Table ─── */
-.nsp-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 12px; }
-.nsp-table th {
-  text-align: left;
-  color: var(--cyan-dim);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--border);
+/* ─── Loading spinner ─── */
+.btn-loading { position: relative; }
+.btn-loading::after {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-left: 6px;
+  vertical-align: middle;
+  opacity: 0.7;
 }
-.nsp-table td { padding: 4px 8px; vertical-align: middle; }
-.nsp-table tr:hover td { background: rgba(0,0,0,0.02); }
-.nsp-table input { padding: 5px 7px; font-size: 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-/* ─── Status Bar ─── */
+/* ─── Misc ─── */
 .status-bar {
   padding: 8px 14px;
   background: var(--surface2);
@@ -364,13 +358,13 @@ textarea { resize: vertical; min-height: 180px; tab-size: 2; }
 
 /* ─── Preview ─── */
 #preview-output {
-  border: 1px solid #3e4451;
+  border: 1px solid var(--editor-border);
   border-radius: 5px;
   max-height: 500px;
 }
 
 #preview-output .cm-editor {
-  background: #282c34;
+  background: var(--editor-bg);
   max-height: 500px;
 }
 
@@ -382,7 +376,7 @@ textarea { resize: vertical; min-height: 180px; tab-size: 2; }
 
 /* ─── CodeMirror Editor ─── */
 .editor-wrap {
-  border: 1px solid var(--border);
+  border: 1px solid var(--editor-border);
   border-radius: 5px;
   overflow: hidden;
   font-size: 12px;
@@ -390,21 +384,21 @@ textarea { resize: vertical; min-height: 180px; tab-size: 2; }
 
 .editor-wrap .cm-editor {
   height: 240px;
-  background: #282c34;
-  color: #abb2bf;
+  background: var(--editor-bg);
+  color: var(--editor-text);
 }
 
 .editor-wrap .cm-editor.cm-focused { outline: none; }
 .editor-wrap .cm-scroller { overflow: auto; font-family: 'JetBrains Mono', 'Courier New', monospace; }
 
-.editor-wrap .cm-content { padding: 8px 0; color: #abb2bf; caret-color: #528bff; }
+.editor-wrap .cm-content { padding: 8px 0; color: var(--editor-text); caret-color: var(--editor-cursor); }
 .editor-wrap .cm-line { padding: 0 10px; }
-.editor-wrap .cm-gutters { background: #21252b; color: #636d83; border: none; border-right: 1px solid #3e4451; }
-.editor-wrap .cm-activeLineGutter { background: #2c313a; }
-.editor-wrap .cm-activeLine { background: #2c313c44; }
-.editor-wrap .cm-selectionBackground { background: #3e4451 !important; }
-.editor-wrap .cm-cursor { border-left-color: #528bff; }
-.editor-wrap .cm-matchingBracket { background: #3e445166; outline: 1px solid #636d83; }
+.editor-wrap .cm-gutters { background: var(--editor-surface); color: var(--editor-gutter); border: none; border-right: 1px solid var(--editor-border); }
+.editor-wrap .cm-activeLineGutter { background: var(--editor-active); }
+.editor-wrap .cm-activeLine { background: rgba(44,49,60,0.4); }
+.editor-wrap .cm-selectionBackground { background: var(--editor-sel) !important; }
+.editor-wrap .cm-cursor { border-left-color: var(--editor-cursor); }
+.editor-wrap .cm-matchingBracket { background: var(--editor-bracket); outline: 1px solid var(--editor-gutter); }
 
 /* Fullscreen overlay */
 .editor-overlay {
@@ -463,6 +457,53 @@ textarea { resize: vertical; min-height: 180px; tab-size: 2; }
   color: var(--cyan-dim);
   text-transform: uppercase;
   letter-spacing: 1.5px;
+}
+
+/* ─── Manual Input Node Preview ─── */
+#manual-node-list {
+  margin-top: 8px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+  font-size: 11px;
+}
+#manual-node-list .manual-node-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-dim);
+}
+#manual-node-list .manual-node-item:last-child { border-bottom: none; }
+#manual-node-list .manual-node-type {
+  background: var(--editor-bg);
+  color: var(--editor-text);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+#manual-node-list .manual-node-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+  font-weight: 500;
+}
+#manual-node-list .manual-node-server {
+  color: var(--text-muted);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+#manual-node-list .manual-node-empty {
+  padding: 6px 8px;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 /* ─── Notification ─── */

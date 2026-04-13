@@ -14,7 +14,10 @@
       "Bash(do echo:*)",
       "Read(//Users/zerolu/Projects/github/Rules/rule-converter/**)",
       "Bash(done)",
-      "Bash(do grep:*)"
+      "Bash(do grep:*)",
+      "Bash(node --check /Users/zerolu/Projects/github/Rules/rule-converter/proxy.js)",
+      "Bash(node -e \"require\\(''''/Users/zerolu/Projects/github/Rules/rule-converter/proxy.js''''\\)\")",
+      "Bash(node --check /Users/zerolu/Projects/github/Rules/rule-converter/app.js)"
     ]
   }
 }

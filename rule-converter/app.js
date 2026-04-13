@@ -17,7 +17,7 @@ async function loadYamlDefaults() {
     try {
       const r = await fetch(f);
       if (r.ok) result[f] = await r.text();
-    } catch (_) {}
+    } catch (e) { console.error("loadYamlDefaults:", f, e); }
   }
   return result;
 }
@@ -25,15 +25,22 @@ async function loadYamlDefaults() {
 // ─────────────────────────────────────────
 // State
 // ─────────────────────────────────────────
-let subscriptions = []; // [{ url, prefix, proxies }]
-let manualProxies = []; // 手动输入节点（始终在最前）
-let _ignoreInput = false;
-let isDirty = false; // 是否存在未保存的更改
-let isLoading = false; // 是否有正在执行的异步操作
+const state = {
+  subscriptions: [],
+  manualProxies: [],
+  ignoreInput: false,
+  isDirty: false,
+  isLoading: false,
+};
 
-// 总订阅节点数（避免多处重复 reduce）
+// 总代理节点数（手动 + 订阅）
+function totalProxyCount() {
+  return state.manualProxies.length + state.subscriptions.reduce((s, sub) => s + sub.proxies.length, 0);
+}
+
+// subProxyCount 保持兼容别名
 function subProxyCount() {
-  return subscriptions.reduce((s, sub) => s + sub.proxies.length, 0);
+  return totalProxyCount() - state.manualProxies.length;
 }
 
 // HTML 转义（防止 XSS）
@@ -45,7 +52,7 @@ const _HTML_ESCAPE_MAP = {
   "'": "&#39;",
 };
 function escapeHtml(str) {
-  return str.replace(/[&<>"']/g, (c) => _HTML_ESCAPE_MAP[c]);
+  return String(str).replace(/[&<>"']/g, (c) => _HTML_ESCAPE_MAP[c]);
 }
 
 // 解析 textarea 文本为订阅数组
@@ -109,7 +116,7 @@ function showNotif(msg, type = "ok") {
 function updateSaveStatus() {
   const el = document.getElementById("save-status");
   if (!el) return;
-  if (isDirty) {
+  if (state.isDirty) {
     el.textContent = "● Unsaved";
     el.className = "dirty";
   } else {
@@ -122,11 +129,16 @@ function updateSaveStatus() {
 // Button loading state
 // ─────────────────────────────────────────
 function setLoading(loading) {
-  isLoading = loading;
-  ["btn-generate", "btn-download", "btn-copy", "btn-save"].forEach((id) => {
-    const btn = document.getElementById(id);
-    if (btn) btn.disabled = loading;
-  });
+  state.isLoading = loading;
+  const btn = document.getElementById("btn-generate");
+  if (btn) {
+    btn.disabled = loading;
+    btn.classList.toggle("btn-loading", loading);
+    btn.textContent = loading ? "⏳ Fetching..." : "▶ 生成配置";
+  }
+  document.getElementById("btn-download").disabled = loading;
+  document.getElementById("btn-copy").disabled = loading;
+  document.getElementById("btn-save").disabled = loading;
 }
 
 // ─────────────────────────────────────────
@@ -138,15 +150,14 @@ function setProxyStatus(text, type = "ok") {
   dot.className = `status-dot ${type}`;
   txt.className = `status-text ${type}`;
   txt.textContent = text;
-  const total = manualProxies.length + subProxyCount();
-  document.getElementById("proxy-count-num").textContent = total;
+  document.getElementById("proxy-count-num").textContent = totalProxyCount();
 }
 
 // ─────────────────────────────────────────
 // Fetch subscription
 // ─────────────────────────────────────────
 async function fetchAllSubscriptions() {
-  if (isLoading) return;
+  if (state.isLoading) return;
   const textarea = document.getElementById("sub-urls");
   const lines = parseSubLines(textarea.value);
 
@@ -156,9 +167,10 @@ async function fetchAllSubscriptions() {
   }
 
   setLoading(true);
-  subscriptions = [];
+  state.subscriptions = [];
   let successCount = 0;
   let failCount = 0;
+  const failedSubscriptions = []; // [{ url, error }]
 
   for (const { url, prefix } of lines) {
     try {
@@ -166,18 +178,19 @@ async function fetchAllSubscriptions() {
       if (!r.ok) throw new Error("HTTP " + r.status);
       const text = decodeBase64(await r.text());
       const proxies = parseProxies(text);
-      subscriptions.push({ url, prefix, proxies, rawYaml: text });
+      state.subscriptions.push({ url, prefix, proxies, rawYaml: text });
       successCount++;
     } catch (e) {
       failCount++;
+      failedSubscriptions.push({ url, error: e.message });
     }
   }
 
   const subCount = subProxyCount();
-  const total = manualProxies.length + subCount;
+  const total = totalProxyCount();
   if (failCount === 0) {
     setProxyStatus(
-      `Total: ${total} (manual: ${manualProxies.length}, subs: ${subCount})`,
+      `Total: ${total} (manual: ${state.manualProxies.length}, subs: ${subCount})`,
       "ok",
     );
     showNotif(
@@ -186,11 +199,14 @@ async function fetchAllSubscriptions() {
     );
   } else {
     setProxyStatus(
-      `Total: ${total} (manual: ${manualProxies.length}, subs: ${subCount})`,
+      `Total: ${total} (manual: ${state.manualProxies.length}, subs: ${subCount})`,
       "warn",
     );
+    const failedDetails = failedSubscriptions
+      .map((f) => `${f.url}: ${f.error}`)
+      .join("; ");
     showNotif(
-      `Fetched ${successCount}, failed ${failCount} subscription(s)`,
+      `Fetched ${successCount}, failed ${failCount}: ${failedDetails}`,
       "warn",
     );
   }
@@ -198,7 +214,7 @@ async function fetchAllSubscriptions() {
   renderSubscriptionList();
   saveState();
   refreshPreview();
-  isDirty = true;
+  state.isDirty = true;
   updateSaveStatus();
   setLoading(false);
 }
@@ -224,7 +240,7 @@ function toggleRaw(i) {
 }
 
 function removeSubscription(index) {
-  subscriptions.splice(index, 1);
+  state.subscriptions.splice(index, 1);
   renderSubscriptionList();
   saveState();
   refreshPreview();
@@ -234,13 +250,13 @@ function renderSubscriptionList() {
   const container = document.getElementById("sub-list");
   if (!container) return;
 
-  if (!subscriptions.length) {
+  if (!state.subscriptions.length) {
     container.innerHTML =
       '<div class="sub-list-empty">No subscriptions added</div>';
     return;
   }
 
-  container.innerHTML = subscriptions
+  container.innerHTML = state.subscriptions
     .map((sub, i) => {
       const safeUrl = escapeHtml(sub.url);
       const urlShort =
@@ -266,12 +282,38 @@ function renderSubscriptionList() {
 }
 
 // ─────────────────────────────────────────
+// Manual node preview
+// ─────────────────────────────────────────
+function renderManualNodeList() {
+  const container = document.getElementById("manual-node-list");
+  if (!container) return;
+
+  if (!state.manualProxies.length) {
+    container.innerHTML = '<div class="manual-node-empty">No nodes parsed yet</div>';
+    return;
+  }
+
+  container.innerHTML = state.manualProxies.map((p) => {
+    const name = escapeHtml(p.name || "(unnamed)");
+    const type = escapeHtml(p.type || "?");
+    const server = escapeHtml(p.server || "");
+    return `
+      <div class="manual-node-item">
+        <span class="manual-node-type">${type}</span>
+        <span class="manual-node-name" title="${name}">${name}</span>
+        ${server ? `<span class="manual-node-server">${server}</span>` : ""}
+      </div>
+    `;
+  }).join("");
+}
+
+// ─────────────────────────────────────────
 // Manual parse
 // ─────────────────────────────────────────
 function parseManualInput() {
   const text = document.getElementById("manual-yaml").value.trim();
   if (!text) {
-    showNotif("Paste some node names or YAML first.", "err");
+    // 空输入时不修改 manualProxies，保留现有状态
     return;
   }
 
@@ -282,19 +324,21 @@ function parseManualInput() {
         showNotif("No proxies found.", "err");
         return;
       }
-      manualProxies = list;
+      state.manualProxies = list;
       const subCount = subProxyCount();
-      const total = manualProxies.length + subCount;
+      const total = totalProxyCount();
       setProxyStatus(
-        `Total: ${total} (manual: ${manualProxies.length}, subs: ${subCount})`,
+        `Total: ${total} (manual: ${state.manualProxies.length}, subs: ${subCount})`,
         "ok",
       );
       showNotif(
-        `Manual: ${manualProxies.length} proxies, Total: ${total}`,
+        `Manual: ${state.manualProxies.length} proxies, Total: ${total}`,
         "ok",
       );
+      renderManualNodeList();
       refreshPreview();
     } catch (e) {
+      console.error("parseManualInput:", e);
       showNotif(e.message, "err");
     }
   }
@@ -417,13 +461,13 @@ function buildMergedConfig() {
   const rulesYaml = window._cmContent["editor-rules"] || "";
 
   // 合并所有订阅节点，叠加前缀
-  const subProxies = subscriptions.flatMap((sub) =>
+  const subProxies = state.subscriptions.flatMap((sub) =>
     sub.proxies.map((p) => ({
       ...p,
       name: (sub.prefix ? sub.prefix + " - " : "") + (p.name || ""),
     })),
   );
-  const finalProxies = [...manualProxies, ...subProxies];
+  const finalProxies = [...state.manualProxies, ...subProxies];
   const proxyNames = finalProxies.map((p) => p.name);
   const finalGroups = buildProxyGroups(proxyNames);
 
@@ -436,10 +480,10 @@ function buildMergedConfig() {
 }
 
 // ─────────────────────────────────────────
+// Refresh preview — debounce (200ms) at caller site (makeEditor)
+// ─────────────────────────────────────────
 async function refreshPreview() {
-  const subCount = subProxyCount();
-  document.getElementById("proxy-count-num").textContent =
-    manualProxies.length + subCount;
+  document.getElementById("proxy-count-num").textContent = totalProxyCount();
 
   let data;
   try {
@@ -455,44 +499,63 @@ async function refreshPreview() {
     return;
   }
 
-  clearTimeout(window._cmFormatTimer);
-  window._cmFormatTimer = setTimeout(async () => {
-    try {
-      const r = await fetch("/api/generate?save=false", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const res = await r.json();
-      if (!r.ok) throw new Error(res.error);
-      window._cmPreview.dispatch({
-        changes: {
-          from: 0,
-          to: window._cmPreview.state.doc.length,
-          insert: res.formatted,
-        },
-      });
-    } catch (e) {
-      window._cmPreview.dispatch({
-        changes: {
-          from: 0,
-          to: window._cmPreview.state.doc.length,
-          insert: `# Format error: ${e.message}`,
-        },
-      });
-    }
-  }, 300);
+  try {
+    const r = await fetch("/api/generate?save=false", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const res = await r.json();
+    if (!r.ok) throw new Error(res.error);
+    window._cmPreview.dispatch({
+      changes: {
+        from: 0,
+        to: window._cmPreview.state.doc.length,
+        insert: res.formatted,
+      },
+    });
+  } catch (e) {
+    window._cmPreview.dispatch({
+      changes: {
+        from: 0,
+        to: window._cmPreview.state.doc.length,
+        insert: `# Format error: ${e.message}`,
+      },
+    });
+  }
 }
 
 // ─────────────────────────────────────────
-// Generate Config — fetch + parse + preview
+// Generate Config — 先解析手动输入，再拉取订阅
 // ─────────────────────────────────────────
 async function generateConfig() {
-  // Parse manual input first
-  parseManualInput();
+  // 解析手动输入（空 textarea 无副作用，不覆盖现有 manualProxies）
+  const hadManualInput = (() => {
+    const text = document.getElementById("manual-yaml").value.trim();
+    if (!text) return false;
+    if (!text.includes("- name:")) return false;
+    try {
+      const list = parseProxies(text);
+      if (!list.length) return false;
+      state.manualProxies = list;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  })();
 
-  // Fetch all subscriptions
   await fetchAllSubscriptions();
+
+  // 若有手动输入，重新更新状态以反映正确数字
+  if (hadManualInput) {
+    const subCount = subProxyCount();
+    const total = totalProxyCount();
+    setProxyStatus(
+      `Total: ${total} (manual: ${state.manualProxies.length}, subs: ${subCount})`,
+      "ok",
+    );
+    renderManualNodeList();
+  }
 }
 
 // ─────────────────────────────────────────
@@ -527,14 +590,14 @@ function copyConfig() {
   navigator.clipboard
     .writeText(yaml)
     .then(() => showNotif("Copied to clipboard!", "ok"))
-    .catch(() => showNotif("Clipboard write failed.", "err"));
+    .catch((e) => { console.error("Clipboard write failed:", e); showNotif("Clipboard write failed.", "err"); });
 }
 
 // ─────────────────────────────────────────
 // Save to Server
 // ─────────────────────────────────────────
 async function saveToServer() {
-  if (isLoading) return;
+  if (state.isLoading) return;
   setLoading(true);
   try {
     const reqData = buildMergedConfig();
@@ -545,7 +608,7 @@ async function saveToServer() {
     });
     const res = await r.json();
     if (!r.ok) throw new Error(res.error || (await r.text()));
-    isDirty = false;
+    state.isDirty = false;
     updateSaveStatus();
     showNotif("Saved to server!", "ok");
     if (res.subUrl) {
@@ -560,6 +623,7 @@ async function saveToServer() {
       fetchSubUrl();
     }
   } catch (e) {
+    console.error("saveToServer:", e);
     showNotif("Save failed: " + e.message, "err");
   } finally {
     setLoading(false);
@@ -595,7 +659,7 @@ async function fetchSubUrl() {
       }
       renderQrCode(data.subUrl);
     }
-  } catch (_) {}
+  } catch (e) { console.error("fetchSubUrl:", e); }
 }
 
 function copySubUrl() {
@@ -606,7 +670,7 @@ function copySubUrl() {
   navigator.clipboard
     .writeText(_currentSubUrl)
     .then(() => showNotif("URL copied!", "ok"))
-    .catch(() => showNotif("Copy failed.", "err"));
+    .catch((e) => { console.error("copySubUrl:", e); showNotif("Copy failed.", "err"); });
 }
 
 // ─────────────────────────────────────────
@@ -670,7 +734,7 @@ const LS_KEY = "rcg_state";
 
 function saveState() {
   try {
-    if (_ignoreInput) return;
+    if (state.ignoreInput) return;
     localStorage.setItem(
       LS_KEY,
       JSON.stringify({
@@ -683,7 +747,7 @@ function saveState() {
           : "manual",
       }),
     );
-  } catch (_) {}
+  } catch (e) { console.error("saveState:", e); }
 }
 
 function loadState() {
@@ -695,10 +759,10 @@ function loadState() {
     const subEl = document.getElementById("sub-urls");
     if (subEl && s.subUrls !== undefined) {
       try {
-        _ignoreInput = true;
+        state.ignoreInput = true;
         subEl.value = s.subUrls;
       } finally {
-        _ignoreInput = false;
+        state.ignoreInput = false;
       }
     }
 
@@ -706,13 +770,19 @@ function loadState() {
     if (manualEl && s.manualYaml !== undefined) manualEl.value = s.manualYaml;
     if (s.activeTab) switchTab(s.activeTab);
     // 节点数据未缓存，subscriptions 保持为空，用户需重新 Fetch
-  } catch (_) {}
+  } catch (e) { console.error("loadState:", e); }
 }
 
 // ─────────────────────────────────────────
 // Init editors — idempotent
+// minimalSetup includes basic language support but not yaml,
+// so yaml() is safe to add without risk of duplicate instances.
 // ─────────────────────────────────────────
 let _inited = false;
+
+// DOM 缓存（避免重复 getElementById）
+const $ = (id) => document.getElementById(id);
+
 async function init() {
   if (_inited) return;
   _inited = true;
@@ -738,7 +808,7 @@ async function init() {
   window._cmTheme = oneDark;
 
   const makeEditor = (domId, label, content) => {
-    const dom = document.getElementById(domId);
+    const domEl = $(domId);
     const view = new EditorView({
       state: EditorState.create({
         doc: content,
@@ -750,7 +820,7 @@ async function init() {
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
               window._cmContent[domId] = update.state.doc.toString();
-              isDirty = true;
+              state.isDirty = true;
               updateSaveStatus();
               clearTimeout(window._cmRefreshTimer);
               window._cmRefreshTimer = setTimeout(refreshPreview, 200);
@@ -758,7 +828,7 @@ async function init() {
           }),
         ],
       }),
-      parent: dom,
+      parent: domEl,
     });
 
     // Fullscreen button
@@ -767,7 +837,7 @@ async function init() {
     btn.style.cssText = "font-size:11px;padding:4px 10px;margin-top:6px;";
     btn.textContent = "⛶ Fullscreen";
     btn.addEventListener("click", () => expandEditor(domId, label, view));
-    dom.parentNode.appendChild(btn);
+    domEl.parentNode.appendChild(btn);
 
     window._cmContent[domId] = content;
     return view;
@@ -786,6 +856,8 @@ async function init() {
   );
 
   // Preview editor (read-only)
+  // minimalSetup does not include yaml language support,
+  // so adding yaml() here does not create a duplicate instance.
   window._cmPreview = new EditorView({
     state: EditorState.create({
       doc: "",
@@ -797,19 +869,20 @@ async function init() {
         EditorState.readOnly.of(true),
       ],
     }),
-    parent: document.getElementById("preview-output"),
+    parent: $("preview-output"),
   });
 
   // 订阅输入和手动节点输入保存
-  document.getElementById("sub-urls").addEventListener("input", () => {
-    if (!_ignoreInput) saveState();
+  $("sub-urls").addEventListener("input", () => {
+    if (!state.ignoreInput) saveState();
   });
-  document.getElementById("manual-yaml").addEventListener("input", () => {
-    if (!_ignoreInput) saveState();
+  $("manual-yaml").addEventListener("input", () => {
+    if (!state.ignoreInput) saveState();
   });
 
   loadState();
   renderSubscriptionList();
+  renderManualNodeList();
   refreshPreview();
   fetchSubUrl();
 }

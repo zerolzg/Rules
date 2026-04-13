@@ -25,16 +25,23 @@ url-rewrite:
   - ^https?:\/\/(www.)?(g|google)\.cn https://www.google.com 302
   - ^https?:\/\/(ditu|maps).google\.cn https://maps.google.com 302
 
+geo-auto-update: true
+# 单位：小时，默认：7 天
+geo-update-interval: 168
+geox-url:
+  geoip: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
+  geosite: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
+  mmdb: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
+  asn: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/GeoLite2-ASN.mmdb"
+
 dns:
   enable: true
   ipv6: false
-  listen: :53
+  listen: 0.0.0.0:1053
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
-    # 通配符
-    - "*"
     - "*.lan"
     - "*.localdomain"
     - "*.example"
@@ -43,12 +50,10 @@ dns:
     - "*.test"
     - "*.local"
     - "*.home.arpa"
-    - "*.direct"
-    # NTP 时间同步
     - "time.*.com"
     - "time.*.gov"
     - "time.*.edu.cn"
-    - "time-ios.apple.com"
+    - "time.*.apple.com"
     - "time1.*.com"
     - "time2.*.com"
     - "time3.*.com"
@@ -65,116 +70,9 @@ dns:
     - "ntp6.*.com"
     - "ntp7.*.com"
     - "*.time.edu.cn"
-    - "*.ntp.org.cn"
-    - "+.pool.ntp.org"
-    - "time1.cloud.tencent.com"
-    # 国内音乐服务
-    - "music.163.com"
-    - "*.music.163.com"
-    - "*.126.net"
-    - "musicapi.taihe.com"
-    - "music.taihe.com"
-    - "songsearch.kugou.com"
-    - "trackercdn.kugou.com"
-    - "*.kuwo.cn"
-    - "api-jooxtt.sanook.com"
-    - "api.joox.com"
-    - "joox.com"
-    - "y.qq.com"
-    - "*.y.qq.com"
-    - "streamoc.music.tc.qq.com"
-    - "mobileoc.music.tc.qq.com"
-    - "isure.stream.qqmusic.qq.com"
-    - "dl.stream.qqmusic.qq.com"
-    - "aqqmusic.tc.qq.com"
-    - "amobile.music.tc.qq.com"
-    - "*.xiami.com"
-    - "*.music.migu.cn"
-    - "music.migu.cn"
-    # 系统与网络服务
-    - "+.msftconnecttest.com"
-    - "+.msftncsi.com"
-    - "localhost.ptlogin2.qq.com"
-    - "localhost.sec.qq.com"
-    - "localhost.*.weixin.qq.com"
-    - "+.kk-rays.com"
-    - "+.steamcontent.com"
-    - "+.srv.nintendo.net"
-    - "*.n.n.srv.nintendo.net"
-    - "+.cdn.nintendo.net"
-    - "xbox.*.*.microsoft.com"
-    - "*.*.xboxlive.com"
-    - "xbox.*.microsoft.com"
-    - "xnotify.xboxlive.com"
-    - "+.battle.net"
-    - "+.battlenet.com.cn"
-    - "+.wotgame.cn"
-    - "+.wggames.cn"
-    - "+.wowsgame.cn"
-    - "+.wargaming.net"
-    - "proxy.golang.org"
-    - "+.stun.*.*"
-    - "+.stun.*.*.*"
-    - "+.stun.*.*.*.*"
-    - "+.stun.*.*.*.*.*"
-    - "heartbeat.belkin.com"
-    - "*.linksys.com"
-    - "*.linksyssmartwifi.com"
-    - "*.router.asus.com"
-    - "mesu.apple.com"
-    - "swscan.apple.com"
-    - "swquery.apple.com"
-    - "swdownload.apple.com"
-    - "swcdn.apple.com"
-    - "swdist.apple.com"
-    - "lens.l.google.com"
-    - "na.b.g-tun.com"
-    # 游戏服务
-    - "*.square-enix.com"
-    - "*.finalfantasyxiv.com"
-    - "*.ffxiv.com"
-    - "*.ff14.sdo.com"
-    - "ff.dorado.sdo.com"
-    - "*.mcdn.bilivideo.cn"
-    - "+.media.dssott.com"
-    - "shark007.net"
-    - "Mijia Cloud"
-    # 其他服务
-    - "+.market.xiaomi.com"
-    - "+.cmbchina.com"
-    - "+.cmbimg.com"
-    - "adguardteam.github.io"
-    - "adrules.top"
-    - "anti-ad.net"
-    - "local.adguard.org"
-    - "static.adtidy.org"
-    - "+.sandai.net"
-    - "+.n0808.com"
-    - "+.3gppnetwork.org"
-    - "+.uu.163.com"
-    - "ps.res.netease.com"
-    - "+.pub.3gppnetwork.org"
-    - "+.oray.com"
-    - "+.orayimg.com"
-    - "+.gcloudcs.com"
-    - "+.gcloudsdk.com"
-    - "+.dynv6.net"
-    # 内网与保留地址
-    - "*.lan"
-    - "*.local"
-    - "*.arpa"
-    - "*.ntp.org"
-    - "*.ip6.arpa"
-    - "isatap"
-    - "teredo.ipv6.microsoft.com"
-    - "*.apple.com"
-    - "captive.apple.com"
-    - "www.msftconnecttest.com"
   default-nameserver:
     - 223.5.5.5
     - 119.29.29.29
-    - 2400:3200::1
-    - "2402:4e00::"
   nameserver:
     - https://cloudflare-dns.com/dns-query
     - https://dns.google/dns-query
@@ -183,26 +81,11 @@ dns:
       - https://doh.pub/dns-query
       - https://dns.alidns.com/dns-query
     "+.cloud-nodes.com":
-      - 140.205.1.13
       - 124.221.68.73:1053
-  fallback: []
-  fallback-filter:
-    geoip: false
-    domain:
-      - "+.google.com"
-      - "+.facebook.com"
-      - "+.youtube.com"
-    ipcidr:
-      - 240.0.0.0/4
-      - 0.0.0.0/32
-      - "::/128"
-      - "::1/128"
-      - "fe80::/10"
-      - "64:ff9b::/96"
   direct-nameserver:
     - https://doh.pub/dns-query
     - https://dns.alidns.com/dns-query
-  direct-nameserver-follow-policy: false
+  direct-nameserver-follow-policy: true
   respect-rules: false
   prefer-h3: false
   use-hosts: false

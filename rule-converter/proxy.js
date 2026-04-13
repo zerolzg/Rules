@@ -12,20 +12,12 @@ const YAML = require("yaml");
 const PORT = 5555;
 const BASE_DIR = __dirname;
 const API_KEY = "123456";
-// 订阅地址对外访问的根 URL
-//   - "auto": 自动检测局域网 IP（默认，适合有公网IP的家用/办公机器）
-//   - http://localhost:PORT: 仅本地开发
-//   - http://<公网IP>:PORT: VPS 或手动指定
 const SERVER_BASE_URL = "auto";
 const SAVED_CONFIG = path.join(BASE_DIR, "config.yaml");
-const STATIC_FILES = {
-  "/": "index.html",
-  "/index.html": "index.html",
-  "/app.js": "app.js",
-  "/style.css": "style.css",
-  "/head.yaml": "../Clash/Head_dns.yaml",
-  "/rules.yaml": "../Clash/Rule.yaml",
-};
+
+// ─────────────────────────────────────────
+// MIME 类型
+// ─────────────────────────────────────────
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
   ".js": "application/javascript",
@@ -34,64 +26,53 @@ const MIME_TYPES = {
   ".yml": "text/yaml",
 };
 
-function formatYaml(text) {
-  // 标准化：先 stringify 再 parseDocument，抹平已有的 flow/block 混用
-  const normalized = YAML.stringify(YAML.parse(text, { maxAliasCount: -1 }));
-  const doc = YAML.parseDocument(normalized, {
-    merge: true,
-    maxAliasCount: -1,
-  });
+// ─────────────────────────────────────────
+// YAML 格式化 — 纯函数，便于单元测试
+// ─────────────────────────────────────────
+function toFlowMap(node) {
+  const flowMap = new YAML.YAMLMap();
+  flowMap.flow = true;
+  for (const pair of node.items) flowMap.items.push(pair);
+  return flowMap;
+}
 
-  // 增加 keyName 参数，用于记录父节点的 key
-  function processNode(node, keyName = null) {
-    if (YAML.isSeq(node)) {
-      // 把数组中是映射的元素转成 flow map (处理 proxies, proxy-groups)
-      node.items = node.items.map((item) => {
-        if (YAML.isMap(item)) {
-          const flowMap = new YAML.YAMLMap();
-          flowMap.flow = true;
-          for (const pair of item.items) flowMap.items.push(pair);
-          return flowMap;
-        }
-        return item;
-      });
-      // forEach 处理 seq 里可能嵌套的 seq（如 proxies 里有内嵌 seq 的情况）
-      node.items.forEach((item) => processNode(item, keyName));
-    } else if (YAML.isMap(node)) {
-      node.items.forEach((pair) => {
-        const currentKey = pair.key ? pair.key.value : null;
-
-        // 【新增逻辑】如果当前处于 rule-providers 或 proxy-providers 节点下
-        // 且子节点的值是一个 Map (例如 AdBlock 下面的对象)
-        if (
-          (keyName === "rule-providers" || keyName === "proxy-providers") &&
-          YAML.isMap(pair.value)
-        ) {
-          const flowMap = new YAML.YAMLMap();
-          flowMap.flow = true; // 设为内联花括号格式
-          for (const p of pair.value.items) flowMap.items.push(p);
-          pair.value = flowMap;
-        }
-
-        // 继续往下递归，并将当前的 key 传下去
-        processNode(pair.value, currentKey);
-      });
-    }
+function processNode(node, keyName = null) {
+  if (YAML.isSeq(node)) {
+    node.items = node.items.map((item) => {
+      if (YAML.isMap(item)) return toFlowMap(item);
+      return item;
+    });
+    node.items.forEach((item) => processNode(item, keyName));
+  } else if (YAML.isMap(node)) {
+    node.items.forEach((pair) => {
+      const currentKey = pair.key ? pair.key.value : null;
+      if (
+        (keyName === "rule-providers" || keyName === "proxy-providers") &&
+        YAML.isMap(pair.value)
+      ) {
+        pair.value = toFlowMap(pair.value);
+      }
+      processNode(pair.value, currentKey);
+    });
   }
+}
 
+function formatYaml(text) {
+  const normalized = YAML.stringify(YAML.parse(text, { maxAliasCount: -1 }));
+  const doc = YAML.parseDocument(normalized, { merge: true, maxAliasCount: -1 });
   if (!doc.contents) return text;
-  // 根节点没有父级 key，所以初始传 null
   processNode(doc.contents);
   return doc.toString({ lineWidth: Infinity });
 }
 
+// ─────────────────────────────────────────
+// 工具函数
+// ─────────────────────────────────────────
 function getLanIP() {
   const nets = os.networkInterfaces();
   for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
-      if (net.family === "IPv4" && !net.internal) {
-        return net.address;
-      }
+      if (net.family === "IPv4" && !net.internal) return net.address;
     }
   }
   return null;
@@ -103,7 +84,6 @@ function getBaseUrl() {
   return lan ? `http://${lan}:${PORT}` : `http://localhost:${PORT}`;
 }
 
-// 收集请求 body
 function collectBody(req) {
   return new Promise((resolve, reject) => {
     let body = "";
@@ -113,32 +93,46 @@ function collectBody(req) {
   });
 }
 
+// ─────────────────────────────────────────
+// 路由表：硬编码白名单，无路径遍历风险
+// ─────────────────────────────────────────
+const ROUTES = {
+  "/":           "index.html",
+  "/index.html": "index.html",
+  "/app.js":     "app.js",
+  "/style.css":  "style.css",
+  "/head.yaml":  "../Clash/Head_dns.yaml",
+  "/rules.yaml": "../Clash/Rule.yaml",
+};
+
+// ─────────────────────────────────────────
+// 服务器
+// ─────────────────────────────────────────
 const server = http.createServer((req, res) => {
   const parsedUrl = urlModule.parse(req.url, true);
   const pathname = parsedUrl.pathname;
   const search = parsedUrl.search || "";
 
-  // 静态文件
-  if (STATIC_FILES[pathname]) {
-    const filename = STATIC_FILES[pathname];
+  // 静态文件 — 路由表驱动（白名单，不存在路径遍历风险）
+  if (ROUTES[pathname] !== undefined) {
+    const filename = ROUTES[pathname];
     const filePath = path.join(BASE_DIR, filename);
-    const ext = path.extname(filename);
+    const ext = path.extname(filePath);
     const contentType = MIME_TYPES[ext] || "application/octet-stream";
-
-    (async () => {
-      try {
-        const data = await fsp.readFile(filePath);
+    fsp.readFile(filePath)
+      .then((data) => {
         res.writeHead(200, { "Content-Type": contentType, "Cache-Control": "no-cache" });
         res.end(data);
-      } catch (_) {
+      })
+      .catch((e) => {
+        console.error("Static file error:", pathname, e);
         res.writeHead(404, { "Content-Type": "text/plain" });
         res.end(`Not found: ${pathname}`);
-      }
-    })();
+      });
     return;
   }
 
-  // 代理 clash 订阅请求: /proxy/<url>
+  // 代理 clash 订阅请求: /proxy?<url>
   if (pathname === "/proxy") {
     const targetUrl = search ? search.slice(1) : "";
     if (!targetUrl) {
@@ -166,17 +160,14 @@ const server = http.createServer((req, res) => {
           if (location) {
             const newUrl = new urlModule.URL(location, decodedUrl).href;
             console.log(`[proxy] redirect → ${newUrl}`);
-            res.writeHead(302, {
-              Location: `/proxy?${encodeURIComponent(newUrl)}`,
-            });
+            res.writeHead(302, { Location: `/proxy?${encodeURIComponent(newUrl)}` });
             res.end();
             return;
           }
         }
         res.writeHead(proxyRes.statusCode, {
           "Access-Control-Allow-Origin": "*",
-          "Content-Type":
-            proxyRes.headers["content-type"] || "application/octet-stream",
+          "Content-Type": proxyRes.headers["content-type"] || "application/octet-stream",
         });
         proxyRes.pipe(res);
       })
@@ -193,19 +184,16 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // API: GET /api/info — 返回订阅地址（无需认证，随时可查）
+  // API: GET /api/info
   if (pathname === "/api/info" && req.method === "GET") {
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(
-      JSON.stringify({ subUrl: `${getBaseUrl()}/api/sub?key=${API_KEY}` }),
-    );
+    res.end(JSON.stringify({ subUrl: `${getBaseUrl()}/api/sub?key=${API_KEY}` }));
     return;
   }
 
-  // API: POST /api/generate — 构建 + 格式化 YAML
-  // query: ?save=false 不写入服务器，仅返回格式化结果
+  // API: POST /api/generate
   if (pathname === "/api/generate" && req.method === "POST") {
-    const doSave = parsedUrl.query.save !== 'false';
+    const doSave = parsedUrl.query.save !== "false";
 
     (async () => {
       try {
@@ -215,13 +203,13 @@ const server = http.createServer((req, res) => {
 
         const head = headYaml ? (YAML.parse(headYaml) || {}) : {};
         const rules = rulesYaml ? (YAML.parse(rulesYaml) || {}) : {};
-        const { rules: rRules, 'rule-providers': rProviders, ...headRest } = { ...head, ...rules };
+        const { rules: rRules, "rule-providers": rProviders, ...headRest } = { ...head, ...rules };
         const config = { ...headRest };
 
         if (proxies.length > 0) config.proxies = proxies;
-        if (proxyGroups.length > 0) config['proxy-groups'] = proxyGroups;
+        if (proxyGroups.length > 0) config["proxy-groups"] = proxyGroups;
         if (rRules) config.rules = rRules;
-        if (rProviders) config['rule-providers'] = rProviders;
+        if (rProviders) config["rule-providers"] = rProviders;
 
         const formatted = formatYaml(YAML.stringify(config));
 
@@ -243,7 +231,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // API: GET /api/sub — 下载已保存的 config.yaml
+  // API: GET /api/sub
   if (pathname === "/api/sub") {
     const { key } = parsedUrl.query;
     if (key !== API_KEY) {
@@ -261,7 +249,8 @@ const server = http.createServer((req, res) => {
           "Access-Control-Allow-Origin": "*",
         });
         res.end(data);
-      } catch (_) {
+      } catch (e) {
+        console.error("/api/sub read error:", e);
         res.writeHead(404, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Config not found. Please save from web UI first." }));
       }
@@ -269,7 +258,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // 未知路径重定向到首页
+  // 未知路径 → 首页
   res.writeHead(302, { Location: "/" });
   res.end();
 });
@@ -279,9 +268,7 @@ server.listen(PORT, "0.0.0.0", () => {
   const subUrl = `${getBaseUrl()}/api/sub?key=${API_KEY}`;
   console.log("");
   console.log("  Local:    http://localhost:" + PORT);
-  if (lanIP) {
-    console.log("  LAN:      http://" + lanIP + ":" + PORT);
-  }
+  if (lanIP) console.log("  LAN:      http://" + lanIP + ":" + PORT);
   console.log("");
   console.log("  Sub URL:  " + subUrl);
   console.log("");

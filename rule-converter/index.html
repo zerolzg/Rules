@@ -55,6 +55,7 @@
         <div class="url-input-wrap" id="input-manual">
           <textarea id="manual-yaml" placeholder="- name: &quot;🇲🇾 evoxt-MY&quot;&#10;  type: vless&#10;  server: ...&#10;- name: &quot;🇲🇾 evoxt-MY2&quot;&#10;  type: vless&#10;  ..." spellcheck="false"></textarea>
           <div class="input-hint">粘贴节点 YAML（含 <code>- name:</code>），或每行一个节点名</div>
+          <div id="manual-node-list"></div>
                   </div>
 
         <div class="status-bar" id="proxy-status">
@@ -102,9 +103,9 @@
       </div>
       <div class="actions-bar">
         <button class="btn btn-primary" id="btn-generate" onclick="generateConfig()">&#9654; 生成配置</button>
-        <button class="btn btn-secondary" id="btn-download" onclick="downloadConfig()">&#9660; Download</button>
+        <button class="btn btn-primary" id="btn-save" onclick="saveToServer()">&#128190; Save</button>
         <button class="btn btn-secondary" id="btn-copy" onclick="copyConfig()">&#128203; Copy</button>
-        <button class="btn btn-primary" id="btn-save" onclick="saveToServer()">&#128190; Save to Server</button>
+        <button class="btn btn-secondary" id="btn-download" onclick="downloadConfig()">&#9660; Download</button>
         <span id="save-status"></span>
         <span class="proxy-count" style="margin-left:auto;">
           proxies:&nbsp;<span class="n" id="proxy-count-num">0</span>
