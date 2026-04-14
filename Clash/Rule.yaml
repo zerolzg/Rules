@@ -21,13 +21,13 @@ rules:
   - "GEOSITE,category-pt,DIRECT"
   - "RULE-SET,AdBlock,AdBlock"
   - "RULE-SET,HTTPDNS,HTTPDNS"
-  - "RULE-SET,Special,DIRECT"
   - "RULE-SET,Global Media,Global Media"
   - "RULE-SET,Asian Media,Asian Media"
   - "RULE-SET,CN Media,CN Media"
   - "RULE-SET,Telegram,Telegram"
   - "RULE-SET,Crypto,Crypto"
   - "RULE-SET,Microsoft,Microsoft"
+  - "RULE-SET,Apple,Apple"
   - "RULE-SET,AI Suite,AI Suite"
   - "RULE-SET,PayPal,PayPal"
   - "RULE-SET,Scholar,Scholar"
@@ -53,12 +53,6 @@ rule-providers:
     behavior: classical
     url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/HTTPDNS.yaml"
     path: ./Rules/HTTPDNS
-    interval: 86400
-  Special:
-    type: http
-    behavior: classical
-    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Special.yaml"
-    path: ./Rules/Special
     interval: 86400
   PROXY:
     type: http

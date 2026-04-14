@@ -37,7 +37,7 @@ geox-url:
 dns:
   enable: true
   ipv6: false
-  listen: 0.0.0.0:1053
+  listen: 0.0.0.0:1253
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   fake-ip-filter-mode: blacklist
@@ -72,21 +72,21 @@ dns:
     - "*.time.edu.cn"
   default-nameserver:
     - 223.5.5.5
-    - 119.29.29.29
+    - 1.1.1.1
   nameserver:
     - https://cloudflare-dns.com/dns-query
     - https://dns.google/dns-query
   nameserver-policy:
-    "geosite:cn,private":
+    geosite:cn,private:
       - https://doh.pub/dns-query
       - https://dns.alidns.com/dns-query
-    "+.cloud-nodes.com":
-      - 124.221.68.73:1053
-  direct-nameserver:
+  proxy-server-nameserver:
     - https://doh.pub/dns-query
     - https://dns.alidns.com/dns-query
-  direct-nameserver-follow-policy: true
-  respect-rules: false
+  proxy-server-nameserver-policy:
+    +.cloud-nodes.com:
+      - 124.221.68.73:1053
+  respect-rules: true
   prefer-h3: false
   use-hosts: false
   use-system-hosts: false
