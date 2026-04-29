@@ -1,0 +1,47 @@
+payload:
+  - DOMAIN-SUFFIX,smtp
+  # ── 进程规则 ────────────────────────────────────────────
+  - PROCESS-NAME,DownloadService.exe
+  - PROCESS-NAME,Folx.exe
+  - PROCESS-NAME,NetTransport.exe
+  - PROCESS-NAME,Thunder.exe
+  - PROCESS-NAME,Transmission.exe
+  - PROCESS-NAME,WebTorrent Helper.exe
+  - PROCESS-NAME,WebTorrent.exe
+  - PROCESS-NAME,Weiyun.exe
+  - PROCESS-NAME,aria2c.exe
+  - PROCESS-NAME,baidunetdisk.exe
+  - PROCESS-NAME,fdm.exe
+  - PROCESS-NAME,qbittorrent.exe
+  - PROCESS-NAME,uTorrent.exe
+  - PROCESS-NAME,aria2c
+  - PROCESS-NAME,fdm
+  - PROCESS-NAME,Folx
+  - PROCESS-NAME,NetTransport
+  - PROCESS-NAME,qbittorrent
+  - PROCESS-NAME,qbittorrent-nox
+  - PROCESS-NAME,Thunder
+  - PROCESS-NAME,Transmission
+  - PROCESS-NAME,uTorrent
+  - PROCESS-NAME,WebTorrent
+  - PROCESS-NAME,WebTorrent Helper
+
+  # ── BT/种子相关域名 ─────────────────────────────────────
+  - DOMAIN-KEYWORD,torrent
+  - DOMAIN-KEYWORD,tracker
+  - DOMAIN-KEYWORD,bittorrent
+  - DOMAIN-KEYWORD,xunlei
+
+  # ── 360/奇虎相关域名 ────────────────────────────────────
+  - DOMAIN-REGEX,(.+\.|^)(360|so|qihoo|360safe|qhimg|360totalsecurity|yunpan)\.(cn|com)$
+
+  # ── 迅雷/Thunder 相关域名 ───────────────────────────────
+  - DOMAIN-KEYWORD,sandai
+  - DOMAIN-KEYWORD,thunder
+  - DOMAIN-KEYWORD,xllivesud
+
+  # ── SMTP 协议关键词 ─────────────────────────────────────
+  - DOMAIN-REGEX,(api|ps|sv|offnavi|newvector|ulog\.imap|newloc)(\.map|)\.(baidu|n\.shifen)\.com$
+
+  # ── Xbox Live 资源域名 ──────────────────────────────────
+  - DOMAIN-REGEX,assets\d+\.xboxlive\.(com|cn)$

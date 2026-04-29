@@ -21,6 +21,7 @@ rules:
   - "GEOSITE,category-pt,DIRECT"
   - "RULE-SET,AdBlock,AdBlock"
   - "RULE-SET,HTTPDNS,HTTPDNS"
+  - "RULE-SET,Download,Download"
   - "RULE-SET,Global Media,Global Media"
   - "RULE-SET,Asian Media,Asian Media"
   - "RULE-SET,CN Media,CN Media"
@@ -47,6 +48,12 @@ rule-providers:
     behavior: domain
     url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/AdBlock.yaml"
     path: ./Rules/AdBlock
+    interval: 86400
+  Download:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Download.yaml"
+    path: ./Rules/Download
     interval: 86400
   HTTPDNS:
     type: http

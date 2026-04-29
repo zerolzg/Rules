@@ -696,7 +696,10 @@ payload:
   # > V2EX
   - DOMAIN-SUFFIX,v2ex.com
 
-  # > nodeseek
+  # > MJJ
+  - DOMAIN-SUFFIX,hostloc.com
+  - DOMAIN-SUFFIX,hostevaluate.com
+  - DOMAIN-SUFFIX,liyuans.com
   - DOMAIN-SUFFIX,nodeseek.com
 
   - DOMAIN-SUFFIX,rpc.unlock-protocol.com

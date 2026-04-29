@@ -1,29 +1,5 @@
-port: 6152
-socks-port: 6153
-mixed-port: 8899
 ipv6: false
-allow-lan: true
 mode: rule
-log-level: info
-external-controller: 127.0.0.1:9090
-secret: dler
-experimental:
-  ignore-resolve-fail: true
-
-# Clash for Windows
-cfw-latency-url: https://cp.cloudflare.com/generate_204
-cfw-latency-timeout: 3000
-cfw-latency-type: 1
-cfw-conn-break-strategy: true
-
-# Clash for Android
-clash-for-android:
-  ui-subtitle-pattern: "[\u4e00-\u9fa5]{2,4}"
-
-# Stash
-url-rewrite:
-  - ^https?:\/\/(www.)?(g|google)\.cn https://www.google.com 302
-  - ^https?:\/\/(ditu|maps).google\.cn https://maps.google.com 302
 
 geo-auto-update: true
 # 单位：小时，默认：7 天
@@ -54,25 +30,11 @@ dns:
     - "time.*.gov"
     - "time.*.edu.cn"
     - "time.*.apple.com"
-    - "time1.*.com"
-    - "time2.*.com"
-    - "time3.*.com"
-    - "time4.*.com"
-    - "time5.*.com"
-    - "time6.*.com"
-    - "time7.*.com"
     - "ntp.*.com"
-    - "ntp1.*.com"
-    - "ntp2.*.com"
-    - "ntp3.*.com"
-    - "ntp4.*.com"
-    - "ntp5.*.com"
-    - "ntp6.*.com"
-    - "ntp7.*.com"
     - "*.time.edu.cn"
   default-nameserver:
-    - 223.5.5.5
-    - 1.1.1.1
+    - 223.6.6.6
+    - 119.29.29.29
   nameserver:
     - https://cloudflare-dns.com/dns-query
     - https://dns.google/dns-query
