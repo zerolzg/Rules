@@ -21,7 +21,7 @@ rules:
   - "GEOSITE,category-pt,DIRECT"
   - "RULE-SET,AdBlock,AdBlock"
   - "RULE-SET,HTTPDNS,HTTPDNS"
-  - "RULE-SET,Download,Download"
+  - "RULE-SET,Download,DIRECT"
   - "RULE-SET,Global Media,Global Media"
   - "RULE-SET,Asian Media,Asian Media"
   - "RULE-SET,CN Media,CN Media"
