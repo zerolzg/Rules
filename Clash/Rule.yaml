@@ -51,7 +51,7 @@ rule-providers:
     interval: 86400
   Download:
     type: http
-    behavior: domain
+    behavior: classical
     url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Download.yaml"
     path: ./Rules/Download
     interval: 86400
