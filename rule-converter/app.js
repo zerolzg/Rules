@@ -97,6 +97,59 @@ function switchTab(mode) {
 }
 
 // ─────────────────────────────────────────
+// Config 栏 head/rules 标签页切换（仅接线层）
+// ─────────────────────────────────────────
+function switchConfigTab(mode) {
+  document.getElementById("cfg-tab-head").classList.toggle("active", mode === "head");
+  document.getElementById("cfg-tab-rules").classList.toggle("active", mode === "rules");
+  document.getElementById("cfg-pane-head").classList.toggle("active", mode === "head");
+  document.getElementById("cfg-pane-rules").classList.toggle("active", mode === "rules");
+  // 隐藏后再显示需让 CodeMirror 重新测量尺寸
+  const v = mode === "head" ? window._cmHead : window._cmRules;
+  if (v && v.requestMeasure) v.requestMeasure();
+}
+
+// ─────────────────────────────────────────
+// 订阅地址浮层开合（仅接线层）
+// ─────────────────────────────────────────
+function openSubUrlModal() {
+  const m = document.getElementById("sub-url-modal");
+  if (m) m.classList.add("show");
+}
+function closeSubUrlModal() {
+  const m = document.getElementById("sub-url-modal");
+  if (m) m.classList.remove("show");
+}
+
+// 实时解析手动输入：仅刷新计数/节点列表/预览，不弹通知（Q11，接线层）
+function liveParseManual() {
+  const el = document.getElementById("manual-yaml");
+  if (!el) return;
+  const text = el.value;
+  if (!text.includes("- name:")) return;
+  try {
+    const list = parseProxies(text);
+    if (!list.length) return;
+    state.manualProxies = list;
+    const subCount = subProxyCount();
+    const total = totalProxyCount();
+    setProxyStatus(
+      `Total: ${total} (manual: ${state.manualProxies.length}, subs: ${subCount})`,
+      "ok",
+    );
+    renderManualNodeList();
+    refreshPreview();
+  } catch (e) {
+    // 解析中途出错时保留上一次有效状态
+  }
+}
+
+// Esc 关闭订阅地址浮层（接线层）
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeSubUrlModal();
+});
+
+// ─────────────────────────────────────────
 // Notification
 // ─────────────────────────────────────────
 let _nt = null;
@@ -161,8 +214,24 @@ async function fetchAllSubscriptions() {
   const textarea = document.getElementById("sub-urls");
   const lines = parseSubLines(textarea.value);
 
+  // 手动节点与订阅 URL 至少填一个才能生成配置
+  if (!lines.length && !state.manualProxies.length) {
+    showNotif("Enter at least one subscription URL or a manual proxy.", "err");
+    return;
+  }
+
+  // 未填订阅 URL 时跳过拉取，仅用已解析的手动节点生成
   if (!lines.length) {
-    showNotif("Enter at least one subscription URL.", "err");
+    state.subscriptions = [];
+    setProxyStatus(
+      `Total: ${totalProxyCount()} (manual: ${state.manualProxies.length}, subs: 0)`,
+      "ok",
+    );
+    renderSubscriptionList();
+    saveState();
+    refreshPreview();
+    state.isDirty = true;
+    updateSaveStatus();
     return;
   }
 
@@ -622,6 +691,7 @@ async function saveToServer() {
     } else {
       fetchSubUrl();
     }
+    openSubUrlModal(); // 保存后自动弹出订阅地址浮层（仅接线层）
   } catch (e) {
     console.error("saveToServer:", e);
     showNotif("Save failed: " + e.message, "err");
@@ -837,7 +907,10 @@ async function init() {
     btn.style.cssText = "font-size:11px;padding:4px 10px;margin-top:6px;";
     btn.textContent = "⛶ Fullscreen";
     btn.addEventListener("click", () => expandEditor(domId, label, view));
-    domEl.parentNode.appendChild(btn);
+    // 放入 code-head 栏（若存在），否则追加到父容器 —— 仅接线层调整
+    const headBar = domEl.closest(".codewrap")?.querySelector(".code-head");
+    if (headBar) headBar.appendChild(btn);
+    else domEl.parentNode.appendChild(btn);
 
     window._cmContent[domId] = content;
     return view;
@@ -878,6 +951,7 @@ async function init() {
   });
   $("manual-yaml").addEventListener("input", () => {
     if (!state.ignoreInput) saveState();
+    liveParseManual(); // 输入即实时解析（仅接线层，不改最终输出提交时机）
   });
 
   loadState();

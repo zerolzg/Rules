@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<!-- ═══════════════════════════════════════════════════════════════════
+     PROTOTYPE (throwaway) — 重设计原型，请勿部署 / 勿加入 proxy.js 白名单
+     问题：grilling 定稿的三栏玻璃工作区实际观感如何？三种美学执行哪一种对味？
+     结构按定稿固定（三栏 1:1:1.4 · 吸顶玻璃顶栏 · 底部命令栏 · head/rules
+     标签页 · 保存后订阅地址浮层 · 中文文案）；?variant=A|B|C 仅切换
+     渐变玻璃执行风格：A 极光 / B 深海 / C 霜面。
+     浮动底部条 + ←/→ 键切换变体；双击本文件 file:// 打开。全部 mock 数据。
+     ═══════════════════════════════════════════════════════════════════ -->
+<html lang="zh-CN" data-variant="aurora">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROTOTYPE — Clash Rules Generator 重设计</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+/* ─── 变体令牌：仅美学执行不同，结构共享 ─── */
+html[data-variant="aurora"] {
+  --bg-grad: linear-gradient(135deg,#101d4f 0%,#2a1458 46%,#063d54 100%);
+  --glow1: rgba(34,211,238,.38); --glow2: rgba(168,139,250,.34);
+  --glass: rgba(255,255,255,.08); --glass-2: rgba(255,255,255,.13);
+  --glass-border: rgba(255,255,255,.17);
+  --text:#e9f0ff; --text-dim:#9db0d4; --text-muted:#6d7fa3;
+  --accent:#22d3ee; --accent-2:#818cf8;
+  --btn-primary: linear-gradient(135deg,#06b6d4,#6366f1);
+  --btn-primary-glow: 0 4px 22px rgba(34,211,238,.35);
+  --ok:#34d399; --warn:#fbbf24; --err:#fb7185;
+  /* 代码区 — 深色但染上极光靛紫基调，与玻璃同源 */
+  --code-bg:#161c36; --code-head-bg:#1b2244; --code-border:rgba(129,140,248,.30);
+  --code-text:#c9d2f2; --code-fname:#8a97c8; --code-dots:#3a4470;
+  --chip-bg:rgba(129,140,248,.16); --chip-text:#a5b4fc;
+  --blur: 18px;
+}
+html[data-variant="deep"] {
+  --bg-grad: linear-gradient(135deg,#04070f 0%,#0a1128 52%,#04202b 100%);
+  --glow1: rgba(56,189,248,.16); --glow2: rgba(99,102,241,.14);
+  --glass: rgba(10,17,36,.60); --glass-2: rgba(16,26,52,.72);
+  --glass-border: rgba(125,160,255,.14);
+  --text:#dce6f8; --text-dim:#8496b8; --text-muted:#57678a;
+  --accent:#38bdf8; --accent-2:#6366f1;
+  --btn-primary: linear-gradient(135deg,#0284c7,#4f46e5);
+  --btn-primary-glow: 0 4px 18px rgba(56,189,248,.22);
+  --ok:#34d399; --warn:#fbbf24; --err:#fb7185;
+  /* 代码区 — 近黑深蓝，几乎从深色玻璃里「沉」下去 */
+  --code-bg:#070d1d; --code-head-bg:#0b1428; --code-border:rgba(56,120,255,.24);
+  --code-text:#b9c8e8; --code-fname:#5c6f99; --code-dots:#223052;
+  --chip-bg:rgba(56,189,248,.14); --chip-text:#7dd3fc;
+  --blur: 14px;
+}
+html[data-variant="frost"] {
+  --bg-grad: linear-gradient(135deg,#dce8ff 0%,#e9e0ff 46%,#d2f3fb 100%);
+  --glow1: rgba(8,145,178,.20); --glow2: rgba(139,92,246,.16);
+  --glass: rgba(255,255,255,.55); --glass-2: rgba(255,255,255,.72);
+  --glass-border: rgba(15,50,110,.15);
+  --text:#16233c; --text-dim:#5b6b8c; --text-muted:#93a2bd;
+  --accent:#0891b2; --accent-2:#4f46e5;
+  --btn-primary: linear-gradient(135deg,#0891b2,#4f46e5);
+  --btn-primary-glow: 0 4px 18px rgba(8,145,178,.28);
+  --ok:#059669; --warn:#d97706; --err:#dc2626;
+  /* 代码区 — 浅色编辑器（One Light 调），与霜面主题同调，不再用深色框 */
+  --code-bg:#fbfcfe; --code-head-bg:#eef2f9; --code-border:rgba(15,50,110,.18);
+  --code-text:#383a42; --code-fname:#7c869e; --code-dots:#cdd6e4;
+  --chip-bg:rgba(79,70,229,.10); --chip-text:#4f46e5;
+  --blur: 16px;
+}
+
+/* 代码区配色随变体走 — 令牌定义在各变体块内（--code-* / --chip-*） */
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
+html,body { height:100%; }
+body {
+  font-family:'JetBrains Mono','Courier New',monospace;
+  font-size:13px; line-height:1.6;
+  color:var(--text);
+  background:var(--bg-grad) fixed;
+  display:flex; flex-direction:column; overflow:hidden;
+}
+/* 彩色辉光斑点 */
+body::before, body::after {
+  content:''; position:fixed; border-radius:50%;
+  filter:blur(90px); pointer-events:none; z-index:0;
+}
+body::before { width:480px; height:480px; background:var(--glow1); top:-140px; right:-100px; }
+body::after  { width:520px; height:520px; background:var(--glow2); bottom:-160px; left:-120px; }
+
+::-webkit-scrollbar { width:8px; height:8px; }
+::-webkit-scrollbar-thumb { background:var(--glass-border); border-radius:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+
+/* ─── 顶栏 ─── */
+.topbar {
+  position:relative; z-index:2; flex-shrink:0;
+  display:flex; align-items:center; gap:14px;
+  padding:12px 20px;
+  background:var(--glass); backdrop-filter:blur(var(--blur)) saturate(150%);
+  border-bottom:1px solid var(--glass-border);
+}
+.brand { display:flex; align-items:baseline; gap:10px; min-width:0; }
+.brand .name { font-size:15px; font-weight:700; letter-spacing:1px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  -webkit-background-clip:text; background-clip:text; color:transparent; white-space:nowrap; }
+.brand .tagline { font-size:10px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; white-space:nowrap; }
+.topbar .spacer { flex:1; }
+.status-pill {
+  display:flex; align-items:center; gap:8px;
+  background:var(--glass-2); border:1px solid var(--glass-border);
+  border-radius:999px; padding:6px 14px; font-size:11px; color:var(--text-dim);
+  white-space:nowrap;
+}
+.status-pill b { color:var(--accent); font-weight:700; }
+.dot { width:7px; height:7px; border-radius:50%; background:var(--ok); flex-shrink:0;
+  box-shadow:0 0 8px var(--ok); }
+.dot.warn { background:var(--warn); box-shadow:0 0 8px var(--warn); }
+.dot.err  { background:var(--err);  box-shadow:0 0 8px var(--err); }
+
+/* ─── 工作区三栏 ─── */
+.workspace {
+  position:relative; z-index:1; flex:1; min-height:0;
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.4fr);
+  gap:14px; padding:14px;
+}
+.col {
+  display:flex; flex-direction:column; min-height:0; min-width:0;
+  background:var(--glass); backdrop-filter:blur(var(--blur)) saturate(150%);
+  border:1px solid var(--glass-border); border-radius:14px;
+  box-shadow:0 8px 32px rgba(0,0,0,.22); overflow:hidden;
+}
+.col-head {
+  flex-shrink:0; display:flex; align-items:center; gap:10px;
+  padding:12px 16px; border-bottom:1px solid var(--glass-border);
+}
+.col-head .num {
+  font-size:10px; font-weight:700; color:var(--accent);
+  border:1px solid var(--glass-border); border-radius:6px; padding:1px 6px;
+  background:var(--glass-2);
+}
+.col-head .title { font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-dim); }
+.col-head .meta { margin-left:auto; font-size:10px; color:var(--text-muted); }
+.col-body { flex:1; min-height:0; display:flex; flex-direction:column; padding:12px 14px; overflow:auto; }
+.col-body.noscroll { overflow:hidden; }
+
+/* ─── 标签页（来源 / 配置 共用） ─── */
+.tabs {
+  flex-shrink:0; display:flex; gap:4px; padding:3px; margin-bottom:12px;
+  background:var(--glass-2); border:1px solid var(--glass-border); border-radius:9px;
+}
+.tab {
+  flex:1; padding:7px 10px; font-family:inherit; font-size:11.5px; font-weight:500;
+  color:var(--text-dim); background:transparent; border:none; border-radius:6px;
+  cursor:pointer; transition:all .18s; white-space:nowrap;
+}
+.tab:hover { color:var(--text); }
+.tab.active { background:var(--btn-primary); color:#fff; font-weight:700;
+  box-shadow:var(--btn-primary-glow); }
+
+.pane { display:none; flex:1; min-height:0; flex-direction:column; }
+.pane.active { display:flex; }
+
+/* ─── 输入 ─── */
+textarea {
+  font-family:inherit; font-size:11.5px; width:100%;
+  color:var(--text); background:rgba(0,0,0,.18);
+  border:1px solid var(--glass-border); border-radius:9px;
+  padding:9px 11px; outline:none; resize:vertical; min-height:96px; tab-size:2;
+  transition:border-color .2s;
+}
+html[data-variant="frost"] textarea { background:rgba(255,255,255,.55); }
+textarea:focus { border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent); }
+.hint { font-size:10px; color:var(--text-muted); line-height:1.55; margin:7px 0 10px; }
+.hint code, .note code { background:var(--glass-2); border-radius:4px; padding:0 4px; }
+.hint .warn-inline { color:var(--warn); }
+
+/* ─── 订阅列表 ─── */
+.sub-item {
+  display:flex; align-items:center; gap:8px;
+  background:var(--glass-2); border:1px solid var(--glass-border);
+  border-radius:9px; padding:7px 9px; margin-bottom:6px; font-size:11px;
+}
+.sub-item .prefix { flex-shrink:0; font-size:13px; }
+.sub-item .count {
+  background:var(--btn-primary); color:#fff; font-weight:700; font-size:10px;
+  border-radius:999px; padding:1px 7px; flex-shrink:0;
+}
+.sub-item .url { flex:1; min-width:0; color:var(--text-dim); overflow:hidden;
+  text-overflow:ellipsis; white-space:nowrap; }
+.btn-sm {
+  font-family:inherit; font-size:10px; font-weight:700; cursor:pointer;
+  background:var(--glass-2); color:var(--text-dim);
+  border:1px solid var(--glass-border); border-radius:6px; padding:3px 9px;
+  transition:all .15s; flex-shrink:0;
+}
+.btn-sm:hover { color:var(--accent); border-color:var(--accent); }
+.btn-sm.danger:hover { color:var(--err); border-color:var(--err); }
+.sub-raw {
+  border:1px solid var(--glass-border); border-top:none; border-radius:0 0 9px 9px;
+  margin:-12px 0 6px; padding:8px; background:rgba(0,0,0,.18);
+  font-size:10.5px; color:var(--text-dim); max-height:130px; overflow:auto; white-space:pre-wrap;
+  word-break:break-all;
+}
+html[data-variant="frost"] .sub-raw { background:rgba(255,255,255,.5); }
+.empty { font-size:11px; color:var(--text-muted); font-style:italic; padding:8px 4px; }
+
+/* ─── 节点列表（手动 / 状态行） ─── */
+.node-item {
+  display:flex; align-items:center; gap:8px; font-size:11px;
+  padding:6px 9px; margin-bottom:5px;
+  background:var(--glass-2); border:1px solid var(--glass-border); border-radius:8px;
+}
+.node-item .type {
+  background:var(--chip-bg); color:var(--chip-text); font-size:9.5px; font-weight:700;
+  text-transform:uppercase; border-radius:4px; padding:1px 6px; flex-shrink:0;
+}
+.node-item .name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500; }
+.node-item .server { color:var(--text-muted); font-size:10px; flex-shrink:0; }
+.col-foot {
+  flex-shrink:0; margin-top:auto; padding-top:10px;
+  border-top:1px solid var(--glass-border);
+  display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-dim);
+}
+
+/* ─── 代码区（One Dark） ─── */
+.codepane { display:none; flex:1; min-height:0; flex-direction:column; }
+.codepane.active { display:flex; }
+.codewrap {
+  flex:1; min-height:0; display:flex; flex-direction:column;
+  background:var(--code-bg); border:1px solid var(--code-border); border-radius:10px;
+  overflow:hidden;
+}
+.codewrap .code-head {
+  flex-shrink:0; display:flex; align-items:center; gap:8px;
+  padding:6px 10px; background:var(--code-head-bg); border-bottom:1px solid var(--code-border);
+}
+.codewrap .code-head .dots { display:flex; gap:5px; }
+.codewrap .code-head .dots i { width:9px; height:9px; border-radius:50%; background:var(--code-dots); }
+.codewrap .code-head .fname { font-size:10px; color:var(--code-fname); }
+.codewrap .code-head button {
+  margin-left:auto; font-family:inherit; font-size:10px; cursor:pointer;
+  background:transparent; color:var(--code-fname);
+  border:1px solid var(--code-border); border-radius:5px; padding:2px 8px;
+}
+.codewrap .code-head button:hover { color:var(--code-text); border-color:var(--code-fname); }
+.codewrap pre {
+  flex:1; min-height:0; overflow:auto; margin:0; padding:10px 12px;
+  font-family:inherit; font-size:11.5px; line-height:1.65; color:var(--code-text);
+  tab-size:2;
+}
+.codewrap.flash { animation:flash .7s; }
+@keyframes flash { 0% { box-shadow:0 0 0 2px var(--accent); } 100% { box-shadow:none; } }
+.tk-key { color:var(--code-fname); } .tk-str { color:var(--code-fname); }
+.tk-num { color:var(--code-fname); } .tk-com { color:var(--code-fname); }
+
+/* ─── 底部命令栏 ─── */
+.commandbar {
+  position:relative; z-index:2; flex-shrink:0;
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  padding:10px 20px;
+  background:var(--glass-2); backdrop-filter:blur(var(--blur)) saturate(150%);
+  border-top:1px solid var(--glass-border);
+}
+.btn {
+  font-family:inherit; font-size:12px; font-weight:700; cursor:pointer;
+  border-radius:8px; padding:8px 16px; letter-spacing:.5px;
+  transition:all .18s; border:1px solid var(--glass-border);
+  background:var(--glass); color:var(--text);
+}
+.btn:hover { border-color:var(--accent); color:var(--accent); transform:translateY(-1px); }
+.btn:active { transform:translateY(0); }
+.btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+.btn-primary {
+  background:var(--btn-primary); color:#fff; border:none;
+  box-shadow:var(--btn-primary-glow);
+}
+.btn-primary:hover { color:#fff; filter:brightness(1.12); }
+.dirty-flag { font-size:11px; color:var(--warn); display:none; align-items:center; gap:6px; }
+.dirty-flag.show { display:flex; }
+.dirty-flag i { width:7px; height:7px; border-radius:50%; background:var(--warn);
+  box-shadow:0 0 8px var(--warn); animation:pulse 1.4s infinite; }
+@keyframes pulse { 50% { opacity:.35; } }
+.btn.loading { position:relative; color:transparent !important; }
+.btn.loading::after {
+  content:''; position:absolute; left:50%; top:50%; width:13px; height:13px;
+  margin:-7px 0 0 -7px; border:2px solid currentColor; border-top-color:transparent;
+  border-radius:50%; animation:spin .6s linear infinite; color:var(--accent);
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ─── 浮层（订阅地址 / 全屏编辑） ─── */
+.overlay { position:fixed; inset:0; z-index:900; display:flex;
+  align-items:center; justify-content:center; padding:24px; }
+.overlay[hidden] { display:none; }
+.overlay .backdrop { position:absolute; inset:0; background:rgba(4,8,20,.55);
+  backdrop-filter:blur(6px); }
+html[data-variant="frost"] .overlay .backdrop { background:rgba(30,45,80,.35); }
+.modal {
+  position:relative; z-index:1; width:100%; max-width:520px;
+  background:var(--glass-2); backdrop-filter:blur(var(--blur)) saturate(160%);
+  border:1px solid var(--glass-border); border-radius:16px;
+  box-shadow:0 24px 70px rgba(0,0,0,.4); padding:18px 20px;
+}
+.modal.wide { max-width:900px; display:flex; flex-direction:column; max-height:calc(100vh - 60px); }
+.modal-head { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.modal-head .mtitle { font-size:13px; font-weight:700; letter-spacing:1px; }
+.modal-head .btn-sm { margin-left:auto; padding:5px 12px; font-size:11px; }
+#sub-url-input {
+  font-family:inherit; font-size:11.5px; width:100%;
+  color:var(--accent); background:rgba(0,0,0,.18);
+  border:1px solid var(--glass-border); border-radius:9px;
+  padding:10px 12px; cursor:pointer; outline:none; margin-bottom:12px;
+}
+html[data-variant="frost"] #sub-url-input { background:rgba(255,255,255,.55); }
+#qr-wrap { display:flex; justify-content:center; margin-bottom:12px; }
+#qr { border-radius:10px; box-shadow:0 4px 18px rgba(0,0,0,.3); }
+.note { font-size:10.5px; color:var(--text-muted); line-height:1.6; text-align:center; }
+.modal.wide .codewrap { flex:1; min-height:320px; }
+
+/* ─── Toast ─── */
+#toast {
+  position:fixed; top:68px; left:50%; transform:translateX(-50%) translateY(-8px);
+  z-index:999; padding:9px 18px; font-size:12px; border-radius:999px;
+  background:var(--glass-2); backdrop-filter:blur(var(--blur));
+  border:1px solid var(--glass-border); color:var(--text);
+  box-shadow:0 8px 28px rgba(0,0,0,.3);
+  opacity:0; pointer-events:none; transition:all .25s;
+}
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+#toast.ok { border-color:var(--ok); color:var(--ok); }
+#toast.warn { border-color:var(--warn); color:var(--warn); }
+#toast.err { border-color:var(--err); color:var(--err); }
+
+/* ─── PROTOTYPE 浮动切换条（勿随设计上线） ─── */
+#proto-bar {
+  position:fixed; bottom:74px; left:50%; transform:translateX(-50%);
+  z-index:1000; display:flex; align-items:center; gap:2px;
+  background:#0d1220f2; color:#e5ecff; border:1px solid #22d3ee66;
+  border-radius:999px; padding:5px 8px;
+  box-shadow:0 10px 34px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06) inset;
+}
+#proto-bar .proto-tag {
+  font-size:9px; font-weight:700; letter-spacing:1.5px; color:#22d3ee;
+  border:1px solid #22d3ee55; border-radius:4px; padding:0 5px; margin-right:6px;
+}
+#proto-bar button {
+  font-family:inherit; font-size:14px; cursor:pointer; line-height:1;
+  background:transparent; color:#9db0d4; border:none; border-radius:50%;
+  width:30px; height:30px;
+}
+#proto-bar button:hover { color:#22d3ee; background:#ffffff14; }
+#proto-bar #variant-label { font-size:11px; min-width:150px; text-align:center; color:#e5ecff; }
+
+/* ─── 窄屏降级：普通滚动单列 ─── */
+@media (max-width: 980px) {
+  html, body { height:auto; overflow:auto; }
+  .workspace { grid-template-columns:1fr; overflow:visible; }
+  .col { max-height:520px; }
+  .commandbar { position:sticky; bottom:10px; margin:0 10px 10px; border-radius:12px;
+    border:1px solid var(--glass-border); }
+  #proto-bar { bottom:14px; }
+  .brand .tagline { display:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ 顶栏 ═══ -->
+<header class="topbar">
+  <div class="brand">
+    <span class="name">Clash Rules Generator</span>
+    <span class="tagline">// clash config generator //</span>
+  </div>
+  <div class="spacer"></div>
+  <div class="status-pill" id="status-pill">
+    <span class="dot" id="status-dot"></span>
+    <span id="status-text">总计 <b id="count-total">0</b> 节点 · 手动 <b id="count-manual">0</b> · 订阅 <b id="count-sub">0</b></span>
+  </div>
+</header>
+
+<!-- ═══ 三栏工作区 ═══ -->
+<main class="workspace">
+
+  <!-- 01 来源 -->
+  <section class="col" id="col-sources">
+    <div class="col-head">
+      <span class="num">01</span><span class="title">来源</span>
+      <span class="meta">订阅 + 手动</span>
+    </div>
+    <div class="col-body">
+      <div class="tabs" data-tabs="src-panes">
+        <button class="tab active" data-tab="url">订阅 URL</button>
+        <button class="tab" data-tab="manual">手动输入</button>
+      </div>
+
+      <div id="src-panes" style="flex:1;min-height:0;display:flex;flex-direction:column;">
+        <!-- 订阅 URL -->
+        <div class="pane active" data-pane="url">
+          <textarea id="sub-urls" spellcheck="false" placeholder="前缀|URL，每行一条"></textarea>
+          <div class="hint">
+            每行一条：<code>前缀|URL</code>（前缀可留空，如 <code>🇭🇰|https://…</code> 或 <code>|https://…</code>）<br>
+            <span class="warn-inline">⚠ 需本地运行 <code>node proxy.js</code>（原型内为 mock 数据）</span>
+          </div>
+          <div id="sub-list"></div>
+        </div>
+        <!-- 手动输入 -->
+        <div class="pane" data-pane="manual">
+          <textarea id="manual-yaml" spellcheck="false" placeholder="粘贴节点 YAML（含 - name:）"></textarea>
+          <div class="hint">粘贴节点 YAML 或每行一个节点名 — <b>输入即实时解析</b>（定稿 Q11）</div>
+          <div id="manual-list"></div>
+        </div>
+      </div>
+
+      <div class="col-foot">
+        <span class="dot ok" id="src-dot"></span>
+        <span id="src-status">就绪</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 配置 -->
+  <section class="col" id="col-config">
+    <div class="col-head">
+      <span class="num">02</span><span class="title">配置</span>
+      <span class="meta">head / rules</span>
+    </div>
+    <div class="col-body noscroll">
+      <div class="tabs" data-tabs="cfg-panes">
+        <button class="tab active" data-tab="head">head.yaml</button>
+        <button class="tab" data-tab="rules">rules.yaml</button>
+      </div>
+
+      <div id="cfg-panes" style="flex:1;min-height:0;display:flex;flex-direction:column;">
+        <div class="codepane active" data-pane="head">
+          <div class="codewrap">
+            <div class="code-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <span class="fname">head.yaml</span>
+              <button data-fs="head">⛶ 全屏</button>
+            </div>
+            <pre id="pre-head"></pre>
+          </div>
+        </div>
+        <div class="codepane" data-pane="rules">
+          <div class="codewrap">
+            <div class="code-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <span class="fname">rules.yaml</span>
+              <button data-fs="rules">⛶ 全屏</button>
+            </div>
+            <pre id="pre-rules"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 实时预览 -->
+  <section class="col" id="col-preview">
+    <div class="col-head">
+      <span class="num">03</span><span class="title">实时预览</span>
+      <span class="meta" id="preview-meta">已格式化 · mock</span>
+    </div>
+    <div class="col-body noscroll">
+      <div class="codewrap" style="flex:1" id="preview-wrap">
+        <div class="code-head">
+          <span class="dots"><i></i><i></i><i></i></span>
+          <span class="fname">config.yaml · 只读</span>
+        </div>
+        <pre id="pre-preview"></pre>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══ 底部命令栏 ═══ -->
+<footer class="commandbar">
+  <button class="btn btn-primary" id="btn-generate">▶ 生成配置</button>
+  <button class="btn" id="btn-save">💾 保存</button>
+  <button class="btn" id="btn-copy">📋 复制</button>
+  <button class="btn" id="btn-download">⬇ 下载</button>
+  <span class="dirty-flag" id="dirty-flag"><i></i> 未保存</span>
+  <div class="spacer" style="flex:1"></div>
+  <button class="btn" id="btn-sub-url">🔗 订阅地址</button>
+</footer>
+
+<!-- ═══ 订阅地址浮层 ═══ -->
+<div class="overlay" id="sub-modal" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="modal">
+    <div class="modal-head">
+      <span class="mtitle">🔗 订阅地址</span>
+      <button class="btn-sm" data-close>✕ 关闭 (Esc)</button>
+    </div>
+    <input type="text" id="sub-url-input" readonly value="http://127.0.0.1:5555/api/sub?key=demo1234" title="点击复制">
+    <div id="qr-wrap"><canvas id="qr" width="168" height="168"></canvas></div>
+    <div class="note">将此地址填入 Clash 客户端的订阅栏即可。<br>
+      ⚠ 部署前请修改 <code>proxy.js</code> 中的 <code>API_KEY</code>（原型仅为示意）。</div>
+  </div>
+</div>
+
+<!-- ═══ 全屏编辑浮层 ═══ -->
+<div class="overlay" id="fs-modal" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="modal wide">
+    <div class="modal-head">
+      <span class="mtitle" id="fs-title"># head.yaml</span>
+      <button class="btn-sm" data-close>✕ 关闭 (Esc)</button>
+    </div>
+    <div class="codewrap"><pre id="fs-pre"></pre></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ═══ PROTOTYPE 切换条 ═══ -->
+<div id="proto-bar">
+  <span class="proto-tag">PROTOTYPE</span>
+  <button id="prev-v" title="上一个变体 (←)">‹</button>
+  <span id="variant-label">A — 极光 Aurora</span>
+  <button id="next-v" title="下一个变体 (→)">›</button>
+</div>
+
+<script>
+/* ═══ mock 数据 ═══ */
+const MOCK_SUBS = [
+  { prefix:'🇭🇰', count:12, url:'https://sub.example.com/hk-clash' },
+  { prefix:'🇺🇸', count:9,  url:'https://provider.net/api/v1/client/clash-us' },
+  { prefix:null, count:4,  url:'https://fallback.io/sub?token=abc123' },
+];
+const MOCK_SUB_URLS_TEXT = '🇭🇰|https://sub.example.com/hk-clash\n🇺🇸|https://provider.net/api/v1/client/clash-us\n|https://fallback.io/sub?token=abc123';
+const MOCK_MANUAL_YAML = [
+  '- name: "🇲🇾 evoxt-MY"',
+  '  type: vless',
+  '  server: my1.evoxt.dev',
+  '- name: "🇲🇾 evoxt-MY2"',
+  '  type: vless',
+  '  server: my2.evoxt.dev',
+  '- name: "🇯🇵 ntk-JP"',
+  '  type: ss',
+  '  server: jp01.ntk.cloud',
+].join('\n');
+const MOCK_HEAD = [
+  '# head.yaml — 全局与 DNS',
+  'mixed-port: 7890',
+  'allow-lan: false',
+  'mode: rule',
+  'log-level: info',
+  'external-controller: 127.0.0.1:9090',
+  'dns:',
+  '  enable: true',
+  '  enhanced-mode: fake-ip',
+  '  nameserver:',
+  '    - 223.5.5.5',
+  '    - 119.29.29.29',
+  '  fallback:',
+  '    - https://1.1.1.1/dns-query',
+].join('\n');
+const MOCK_RULES = [
+  '# rules.yaml — 分流规则',
+  'rules:',
+  '  - DOMAIN-SUFFIX,openai.com,AI Suite',
+  '  - DOMAIN-SUFFIX,claude.ai,AI Suite',
+  '  - DOMAIN-SUFFIX,google.com,Global Media',
+  '  - DOMAIN-KEYWORD,youtube,Global Media',
+  '  - DOMAIN-SUFFIX,github.com,Proxy',
+  '  - DOMAIN-SUFFIX,apple.com,Apple',
+  '  - DOMAIN-SUFFIX,telegram.org,Telegram',
+  '  - IP-CIDR,91.108.4.0/22,Telegram,no-resolve',
+  '  - DOMAIN-SUFFIX,steampowered.com,Steam',
+  '  - DOMAIN-SUFFIX,epicgames.com,Steam',
+  '  - DOMAIN-SUFFIX,mihoyo.com,miHoYo',
+  '  - GEOIP,CN,Domestic',
+  '  - MATCH,Others',
+].join('\n');
+function mockPreviewYaml(subCount, manualCount) {
+  return [
+    '# merged config — generated (mock)',
+    'mixed-port: 7890',
+    'allow-lan: false',
+    'mode: rule',
+    'log-level: info',
+    'external-controller: 127.0.0.1:9090',
+    'dns:',
+    '  enable: true',
+    '  enhanced-mode: fake-ip',
+    '  nameserver:',
+    '    - 223.5.5.5',
+    '    - 119.29.29.29',
+    '',
+    'proxies:',
+    '  - name: "🇲🇾 evoxt-MY"',
+    '    type: vless',
+    '    server: my1.evoxt.dev',
+    '  - name: "🇯🇵 ntk-JP"',
+    '    type: ss',
+    '    server: jp01.ntk.cloud',
+    '  - name: "🇭🇰 HK-01"',
+    '    type: ss',
+    '    server: hk01.sub.example.com',
+    '  # … 共 ' + (subCount + manualCount) + ' 个节点（手动 ' + manualCount + ' · 订阅 ' + subCount + '）',
+    '',
+    'proxy-groups:',
+    '  - name: Proxy',
+    '    type: select',
+    '    proxies: [Auto - UrlTest, DIRECT, /* ' + (subCount + manualCount) + ' nodes */]',
+    '  - name: Auto - UrlTest',
+    '    type: url-test',
+    '    url: https://cp.cloudflare.com/generate_204',
+    '    interval: 3600',
+    '    proxies: [/* ' + (subCount + manualCount) + ' nodes */]',
+    '  - name: Domestic',
+    '    type: select',
+    '    proxies: [DIRECT, Proxy]',
+    '  - name: Others',
+    '    type: select',
+    '    proxies: [Proxy, DIRECT]',
+    '  - name: AI Suite',
+    '    type: select',
+    '    proxies: [Proxy, DIRECT]',
+    '  # … 其余策略组模板',
+    '',
+    'rules:',
+    '  - DOMAIN-SUFFIX,openai.com,AI Suite',
+    '  - DOMAIN-SUFFIX,github.com,Proxy',
+    '  - GEOIP,CN,Domestic',
+    '  - MATCH,Others',
+  ].join('\n');
+}
+
+/* ═══ 状态（内存，无持久化） ═══ */
+const S = { subs: MOCK_SUBS.map(s => ({...s})), manual: [], dirty: false };
+const $ = id => document.getElementById(id);
+
+/* ═══ 变体切换 ═══ */
+const VARIANTS = [
+  { key:'aurora', label:'A — 极光 Aurora' },
+  { key:'deep',   label:'B — 深海 Deep' },
+  { key:'frost',  label:'C — 霜面 Frost' },
+];
+function currentVariant() {
+  const p = new URLSearchParams(location.search).get('variant');
+  return VARIANTS.some(v => v.key === p) ? p : 'aurora';
+}
+function applyVariant(key) {
+  document.documentElement.dataset.variant = key;
+  $('variant-label').textContent = VARIANTS.find(v => v.key === key).label;
+  try { history.replaceState(null, '', '?variant=' + key); } catch (e) {}
+}
+function cycleVariant(d) {
+  const i = VARIANTS.findIndex(v => v.key === currentVariant());
+  applyVariant(VARIANTS[(i + d + VARIANTS.length) % VARIANTS.length].key);
+}
+$('prev-v').onclick = () => cycleVariant(-1);
+$('next-v').onclick = () => cycleVariant(1);
+
+/* ═══ Toast ═══ */
+let _tt = null;
+function toast(msg, type = 'ok') {
+  const el = $('toast');
+  el.textContent = msg;
+  el.className = 'show ' + type;
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.className = '', 2400);
+}
+
+/* ═══ 计数与状态 ═══ */
+function recount() {
+  const subCount = S.subs.reduce((s, x) => s + x.count, 0);
+  const total = subCount + S.manual.length;
+  $('count-total').textContent = total;
+  $('count-manual').textContent = S.manual.length;
+  $('count-sub').textContent = subCount;
+  return total;
+}
+function setSrcStatus(text, type = 'ok') {
+  $('src-dot').className = 'dot ' + (type === 'ok' ? '' : type);
+  $('src-status').textContent = text;
+}
+function setDirty(b) {
+  S.dirty = b;
+  $('dirty-flag').classList.toggle('show', b);
+}
+
+/* ═══ 渲染：订阅列表 ═══ */
+function renderSubs() {
+  const box = $('sub-list');
+  if (!S.subs.length) {
+    box.innerHTML = '<div class="empty">暂无订阅，上方输入后点击「生成配置」</div>';
+    return;
+  }
+  box.innerHTML = S.subs.map((s, i) => `
+    <div class="sub-item">
+      <span class="prefix">${s.prefix || '<span style="color:var(--text-muted)">—</span>'}</span>
+      <span class="count">${s.count}</span>
+      <span class="url" title="${s.url}">${s.url.length > 42 ? s.url.slice(0, 39) + '...' : s.url}</span>
+      <button class="btn-sm" data-raw="${i}">Raw</button>
+      <button class="btn-sm danger" data-del="${i}">✕</button>
+    </div>
+    <div class="sub-raw" id="raw-${i}" style="display:none">proxies:\n  - name: "${s.prefix || ''} HK-01"\n    type: ss\n    server: node01.example.com\n  - name: "${s.prefix || ''} HK-02"\n    type: ss\n    server: node02.example.com\n  # … mock raw yaml</div>
+  `).join('');
+}
+
+/* ═══ 渲染：手动节点（实时解析） ═══ */
+function parseManual(text) {
+  const out = [];
+  for (const block of text.split(/(?=- name:)/)) {
+    const name = (block.match(/- name:\s*"?([^"\n]*)"?\s*,?/) || [])[1];
+    if (!name) continue;
+    const type = (block.match(/type:\s*([a-z0-9-]+)/i) || [])[1] || '?';
+    const server = (block.match(/server:\s*([^\s,}]+)/) || [])[1] || '';
+    out.push({ name, type, server });
+  }
+  return out;
+}
+function renderManual() {
+  const box = $('manual-list');
+  if (!S.manual.length) {
+    box.innerHTML = '<div class="empty">尚未解析到节点</div>';
+    return;
+  }
+  box.innerHTML = S.manual.map(n => `
+    <div class="node-item">
+      <span class="type">${n.type}</span>
+      <span class="name" title="${n.name}">${n.name}</span>
+      ${n.server ? `<span class="server">${n.server}</span>` : ''}
+    </div>
+  `).join('');
+}
+
+/* ═══ 通用标签页 ═══ */
+document.querySelectorAll('[data-tabs]').forEach(group => {
+  group.addEventListener('click', e => {
+    const btn = e.target.closest('[data-tab]');
+    if (!btn) return;
+    group.querySelectorAll('[data-tab]').forEach(x => x.classList.toggle('active', x === btn));
+    const scope = $(group.dataset.tabs);
+    scope.querySelectorAll(':scope > [data-pane]').forEach(p =>
+      p.classList.toggle('active', p.dataset.pane === btn.dataset.tab));
+  });
+});
+
+/* ═══ 事件：来源 ═══ */
+$('sub-urls').addEventListener('input', () => setDirty(true));
+$('manual-yaml').addEventListener('input', () => {
+  S.manual = parseManual($('manual-yaml').value);
+  renderManual();
+  recount();
+  setSrcStatus(`手动解析：${S.manual.length} 节点`, 'ok');
+  setDirty(true);
+});
+$('sub-list').addEventListener('click', e => {
+  const rawBtn = e.target.closest('[data-raw]');
+  const delBtn = e.target.closest('[data-del]');
+  if (rawBtn) {
+    const i = rawBtn.dataset.raw;
+    const el = $('raw-' + i);
+    const show = el.style.display === 'none';
+    el.style.display = show ? 'block' : 'none';
+    rawBtn.textContent = show ? '收起' : 'Raw';
+  }
+  if (delBtn) {
+    const i = +delBtn.dataset.del;
+    S.subs.splice(i, 1);
+    renderSubs();
+    recount();
+    setSrcStatus(`已移除订阅 · 总计 ${recount()} 节点`, 'warn');
+    setDirty(true);
+    toast('已移除订阅（mock）', 'warn');
+  }
+});
+
+/* ═══ 事件：命令栏 ═══ */
+$('btn-generate').addEventListener('click', () => {
+  const btn = $('btn-generate');
+  btn.disabled = true; btn.classList.add('loading'); btn.textContent = '拉取中…';
+  setSrcStatus('正在拉取订阅（mock 延迟 0.9s）…', 'warn');
+  setTimeout(() => {
+    btn.disabled = false; btn.classList.remove('loading'); btn.textContent = '▶ 生成配置';
+    const total = recount();
+    setSrcStatus(`总计 ${total} 节点 · 手动 ${S.manual.length} · 订阅 ${S.subs.reduce((s, x) => s + x.count, 0)}`, 'ok');
+    $('pre-preview').textContent = mockPreviewYaml(S.subs.reduce((s, x) => s + x.count, 0), S.manual.length);
+    const wrap = $('preview-wrap');
+    wrap.classList.remove('flash'); void wrap.offsetWidth; wrap.classList.add('flash');
+    toast(`已生成 · 共 ${total} 个节点`, 'ok');
+    setDirty(true);
+  }, 900);
+});
+$('btn-save').addEventListener('click', () => {
+  toast('已保存到服务端（mock）', 'ok');
+  setDirty(false);
+  openSubModal();
+});
+$('btn-copy').addEventListener('click', () => {
+  const text = $('pre-preview').textContent;
+  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+    .then(() => toast('已复制到剪贴板', 'ok'))
+    .catch(() => toast('剪贴板写入失败', 'err'));
+});
+$('btn-download').addEventListener('click', () => {
+  const blob = new Blob([$('pre-preview').textContent], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'config.yaml';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+  toast('config.yaml 已下载（mock 内容）', 'ok');
+});
+$('btn-sub-url').addEventListener('click', openSubModal);
+
+/* ═══ 浮层 ═══ */
+function openSubModal() {
+  $('sub-modal').hidden = false;
+  drawQR($('qr'), $('sub-url-input').value);
+}
+function closeOverlays() {
+  $('sub-modal').hidden = true;
+  $('fs-modal').hidden = true;
+}
+$('sub-url-input').addEventListener('click', () => {
+  (navigator.clipboard ? navigator.clipboard.writeText($('sub-url-input').value) : Promise.reject())
+    .then(() => toast('订阅地址已复制', 'ok'))
+    .catch(() => toast('复制失败', 'err'));
+});
+document.addEventListener('click', e => {
+  const closer = e.target.closest('[data-close]');
+  if (closer) closer.closest('.overlay').hidden = true;
+  const fsBtn = e.target.closest('[data-fs]');
+  if (fsBtn) {
+    const which = fsBtn.dataset.fs;
+    $('fs-title').textContent = which === 'head' ? '# head.yaml' : '# rules.yaml';
+    $('fs-pre').textContent = which === 'head' ? MOCK_HEAD : MOCK_RULES;
+    $('fs-modal').hidden = false;
+  }
+});
+
+/* ═══ 伪二维码（示意） ═══ */
+function drawQR(cv, text) {
+  const n = 25, cell = cv.width / n;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.fillStyle = '#111';
+  let seed = 0; for (const c of text) seed = (seed * 31 + c.charCodeAt(0)) >>> 0;
+  const rnd = () => { seed = (seed * 1103515245 + 12345) >>> 0; return seed / 4294967296; };
+  const inFinder = (x, y) => (x < 8 && y < 8) || (x > n - 9 && y < 8) || (x < 8 && y > n - 9);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++)
+    if (!inFinder(x, y) && rnd() > 0.52) ctx.fillRect(x * cell, y * cell, cell, cell);
+  const finder = (x, y) => {
+    ctx.fillStyle = '#111'; ctx.fillRect(x * cell, y * cell, 7 * cell, 7 * cell);
+    ctx.fillStyle = '#fff'; ctx.fillRect((x + 1) * cell, (y + 1) * cell, 5 * cell, 5 * cell);
+    ctx.fillStyle = '#111'; ctx.fillRect((x + 2) * cell, (y + 2) * cell, 3 * cell, 3 * cell);
+  };
+  finder(0, 0); finder(n - 7, 0); finder(0, n - 7);
+}
+
+/* ═══ 键盘 ═══ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeOverlays(); return; }
+  if (e.target.matches('input, textarea, [contenteditable]')) return;
+  if (e.key === 'ArrowLeft') cycleVariant(-1);
+  if (e.key === 'ArrowRight') cycleVariant(1);
+});
+
+/* ═══ 初始化 ═══ */
+applyVariant(currentVariant());
+$('sub-urls').value = MOCK_SUB_URLS_TEXT;
+$('manual-yaml').value = MOCK_MANUAL_YAML;
+$('pre-head').textContent = MOCK_HEAD;
+$('pre-rules').textContent = MOCK_RULES;
+$('pre-preview').textContent = mockPreviewYaml(25, 3);
+S.manual = parseManual($('manual-yaml').value);
+renderSubs();
+renderManual();
+recount();
+setSrcStatus(`就绪 · 总计 ${recount()} 节点（mock 数据）`, 'ok');
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,114 +21,131 @@
 </head>
 <body>
 
-<header>
-  <div class="logo">Clash Rules Generator</div>
-  <div class="tagline">// clash config generator //</div>
+<!-- ═══ 吸顶玻璃顶栏：品牌 + 实时代理状态 ═══ -->
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">Clash Rules Generator</div>
+    <div class="tagline">// clash config generator //</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="status-pill">
+    <span class="status-dot" id="proxy-dot"></span>
+    <span class="status-text" id="proxy-status-text">No proxies loaded</span>
+    <span id="proxy-count-num" class="hidden-num">0</span>
+  </div>
 </header>
 
-<div class="container">
+<!-- ═══ 三栏工作区 ═══ -->
+<main class="workspace">
 
-  <!-- LEFT: Input + YAML editors -->
-  <div class="col-left">
-
-    <!-- Proxy Input -->
-    <div class="panel" id="panel-input">
-      <div class="panel-header" onclick="togglePanel('panel-input')">
-        <span class="panel-title">[&gt;] Proxy Input</span>
-        <span class="panel-toggle">&#9660;</span>
+  <!-- 01 来源 -->
+  <section class="col" id="col-sources">
+    <div class="col-head">
+      <span class="num">01</span><span class="title">来源</span>
+      <span class="meta">订阅 + 手动</span>
+    </div>
+    <div class="col-body">
+      <div class="tabs">
+        <button class="tab active" id="tab-url" onclick="switchTab('url')">订阅 URL</button>
+        <button class="tab" id="tab-manual" onclick="switchTab('manual')">手动输入</button>
       </div>
-      <div class="panel-body">
-        <div class="tabs">
-          <button class="tab active" id="tab-url" onclick="switchTab('url')">Subscription URL</button>
-          <button class="tab" id="tab-manual" onclick="switchTab('manual')">Manual Input</button>
-        </div>
 
-        <div class="url-input-wrap active" id="input-url">
-          <div class="input-hint">
-            One subscription per line: <code>前缀|URL</code>（前缀留空则无前缀，如 <code>🇭🇰|https://...</code> 或 <code>|https://...</code>）<br>
-            <span style="color:var(--yellow)">&#9888; Requires <code>node proxy.js</code> running at http://localhost:5555</span>
+      <div class="pane active" id="input-url">
+        <div class="input-hint">
+          每行一条：<code>前缀|URL</code>（前缀可留空，如 <code>🇭🇰|https://…</code> 或 <code>|https://…</code>）<br>
+          <span style="color:var(--warn)">⚠ 需本地运行 <code>node proxy.js</code></span>
+        </div>
+        <textarea id="sub-urls" placeholder="🇭🇰|https://example.com/clash/proxies1&#10;🇺🇸|https://example.com/clash/proxies2" spellcheck="false"></textarea>
+        <div id="sub-list"></div>
+      </div>
+
+      <div class="pane" id="input-manual">
+        <textarea id="manual-yaml" placeholder="- name: &quot;🇲🇾 evoxt-MY&quot;&#10;  type: vless&#10;  server: ..." spellcheck="false"></textarea>
+        <div class="input-hint">粘贴节点 YAML（含 <code>- name:</code>），或每行一个节点名 — <b>输入即实时解析</b></div>
+        <div id="manual-node-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 配置 -->
+  <section class="col" id="col-config">
+    <div class="col-head">
+      <span class="num">02</span><span class="title">配置</span>
+      <span class="meta">head / rules</span>
+    </div>
+    <div class="col-body col-body--noscroll">
+      <div class="tabs" id="cfg-tabs">
+        <button class="tab active" id="cfg-tab-head" onclick="switchConfigTab('head')">head.yaml</button>
+        <button class="tab" id="cfg-tab-rules" onclick="switchConfigTab('rules')">rules.yaml</button>
+      </div>
+
+      <div class="pane active" id="cfg-pane-head">
+        <div class="codewrap" id="codewrap-head">
+          <div class="code-head">
+            <span class="ctrl-dots"><i></i><i></i><i></i></span>
+            <span class="fname">head.yaml</span>
+            <!-- ⛶ 全屏按钮由 app.js 的 makeEditor 追加到此 -->
           </div>
-          <textarea id="sub-urls" placeholder="🇭🇰|https://example.com/clash/proxies1&#10;🇺🇸|https://example.com/clash/proxies2" spellcheck="false"></textarea>
-                    <div id="sub-list"></div>
+          <div class="codewrap-body"><div id="editor-head"></div></div>
         </div>
+      </div>
 
-        <div class="url-input-wrap" id="input-manual">
-          <textarea id="manual-yaml" placeholder="- name: &quot;🇲🇾 evoxt-MY&quot;&#10;  type: vless&#10;  server: ...&#10;- name: &quot;🇲🇾 evoxt-MY2&quot;&#10;  type: vless&#10;  ..." spellcheck="false"></textarea>
-          <div class="input-hint">粘贴节点 YAML（含 <code>- name:</code>），或每行一个节点名</div>
-          <div id="manual-node-list"></div>
-                  </div>
-
-        <div class="status-bar" id="proxy-status">
-          <div class="status-dot" id="proxy-dot"></div>
-          <span class="status-text" id="proxy-status-text">No proxies loaded</span>
+      <div class="pane" id="cfg-pane-rules">
+        <div class="codewrap" id="codewrap-rules">
+          <div class="code-head">
+            <span class="ctrl-dots"><i></i><i></i><i></i></span>
+            <span class="fname">rules.yaml</span>
+          </div>
+          <div class="codewrap-body"><div id="editor-rules"></div></div>
         </div>
       </div>
     </div>
+  </section>
 
-    <!-- head.yaml -->
-    <div class="panel" id="panel-head">
-      <div class="panel-header" onclick="togglePanel('panel-head')">
-        <span class="panel-title">[#] head.yaml</span>
-        <span class="panel-toggle">&#9660;</span>
-      </div>
-      <div class="panel-body">
-        <div class="editor-wrap" id="editor-head"></div>
-      </div>
+  <!-- 03 实时预览 -->
+  <section class="col" id="col-preview">
+    <div class="col-head">
+      <span class="num">03</span><span class="title">实时预览</span>
+      <span class="meta">已格式化 · 只读</span>
     </div>
-
-    <!-- rules.yaml -->
-    <div class="panel" id="panel-rules">
-      <div class="panel-header" onclick="togglePanel('panel-rules')">
-        <span class="panel-title">[R] rules.yaml</span>
-        <span class="panel-toggle">&#9660;</span>
-      </div>
-      <div class="panel-body">
-        <div class="editor-wrap" id="editor-rules"></div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- RIGHT: NSP + Preview -->
-  <div class="col-right">
-
-    <!-- Live Preview -->
-    <div class="panel panel-preview" id="panel-preview">
-      <div class="panel-header" onclick="togglePanel('panel-preview')">
-        <span class="panel-title">[~] Live Preview</span>
-        <span class="panel-toggle">&#9660;</span>
-      </div>
-      <div class="panel-body">
-        <div class="preview-wrap" id="preview-output"></div>
-      </div>
-      <div class="actions-bar">
-        <button class="btn btn-primary" id="btn-generate" onclick="generateConfig()">&#9654; 生成配置</button>
-        <button class="btn btn-primary" id="btn-save" onclick="saveToServer()">&#128190; Save</button>
-        <button class="btn btn-secondary" id="btn-copy" onclick="copyConfig()">&#128203; Copy</button>
-        <button class="btn btn-secondary" id="btn-download" onclick="downloadConfig()">&#9660; Download</button>
-        <span id="save-status"></span>
-        <span class="proxy-count" style="margin-left:auto;">
-          proxies:&nbsp;<span class="n" id="proxy-count-num">0</span>
-        </span>
-      </div>
-    </div>
-
-    <!-- Subscription URL -->
-    <div class="panel" id="panel-sub-url">
-      <div class="panel-header" onclick="togglePanel('panel-sub-url')">
-        <span class="panel-title">[&#9776;] Subscription URL</span>
-        <span class="panel-toggle">&#9660;</span>
-      </div>
-      <div class="panel-body">
-        <input type="text" id="sub-url-input" readonly placeholder="Save to server first to get URL" onclick="copySubUrl()" title="Click to copy">
-        <div id="qr-code"></div>
-        <div class="sub-url-note">
-          Fill this URL in your Clash client's subscription field.<br>
-          &#9888; Change <code>API_KEY</code> in <code>proxy.js</code> before deploying.
+    <div class="col-body col-body--noscroll">
+      <div class="codewrap" id="codewrap-preview">
+        <div class="code-head">
+          <span class="ctrl-dots"><i></i><i></i><i></i></span>
+          <span class="fname">config.yaml</span>
         </div>
+        <div class="codewrap-body"><div id="preview-output"></div></div>
       </div>
     </div>
+  </section>
 
+</main>
+
+<!-- ═══ 底部常驻命令栏 ═══ -->
+<footer class="commandbar">
+  <button class="btn btn-primary" id="btn-generate" onclick="generateConfig()">▶ 生成配置</button>
+  <button class="btn btn-primary" id="btn-save" onclick="saveToServer()">💾 保存</button>
+  <button class="btn btn-secondary" id="btn-copy" onclick="copyConfig()">📋 复制</button>
+  <button class="btn btn-secondary" id="btn-download" onclick="downloadConfig()">⬇ 下载</button>
+  <span id="save-status"></span>
+  <span class="spacer"></span>
+  <button class="btn btn-secondary" id="btn-sub-url" onclick="openSubUrlModal()">🔗 订阅地址</button>
+</footer>
+
+<!-- ═══ 订阅地址浮层 ═══ -->
+<div class="overlay" id="sub-url-modal">
+  <div class="fullscreen-backdrop" onclick="closeSubUrlModal()"></div>
+  <div class="modal">
+    <div class="modal-head">
+      <span class="editor-title">🔗 订阅地址</span>
+      <button class="btn btn-secondary" onclick="closeSubUrlModal()">✕ 关闭 (Esc)</button>
+    </div>
+    <input type="text" id="sub-url-input" readonly placeholder="保存后生成订阅地址" onclick="copySubUrl()" title="点击复制">
+    <div id="qr-code"></div>
+    <div class="sub-url-note">
+      将此地址填入 Clash 客户端的订阅栏。<br>
+      ⚠ 部署前请修改 <code>proxy.js</code> 中的 <code>API_KEY</code>。
+    </div>
   </div>
 </div>
 

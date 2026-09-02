@@ -5,7 +5,6 @@ const http = require("http");
 const https = require("https");
 const fsp = require("fs").promises;
 const path = require("path");
-const urlModule = require("url");
 const os = require("os");
 const YAML = require("yaml");
 
@@ -109,7 +108,7 @@ const ROUTES = {
 // 服务器
 // ─────────────────────────────────────────
 const server = http.createServer((req, res) => {
-  const parsedUrl = urlModule.parse(req.url, true);
+  const parsedUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
   const pathname = parsedUrl.pathname;
   const search = parsedUrl.search || "";
 
@@ -158,7 +157,7 @@ const server = http.createServer((req, res) => {
         if ([301, 302, 303, 307, 308].includes(proxyRes.statusCode)) {
           const location = proxyRes.headers.location;
           if (location) {
-            const newUrl = new urlModule.URL(location, decodedUrl).href;
+            const newUrl = new URL(location, decodedUrl).href;
             console.log(`[proxy] redirect → ${newUrl}`);
             res.writeHead(302, { Location: `/proxy?${encodeURIComponent(newUrl)}` });
             res.end();
@@ -193,7 +192,7 @@ const server = http.createServer((req, res) => {
 
   // API: POST /api/generate
   if (pathname === "/api/generate" && req.method === "POST") {
-    const doSave = parsedUrl.query.save !== "false";
+    const doSave = parsedUrl.searchParams.get("save") !== "false";
 
     (async () => {
       try {
@@ -233,7 +232,7 @@ const server = http.createServer((req, res) => {
 
   // API: GET /api/sub
   if (pathname === "/api/sub") {
-    const { key } = parsedUrl.query;
+    const key = parsedUrl.searchParams.get("key");
     if (key !== API_KEY) {
       res.writeHead(401, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "Unauthorized" }));
