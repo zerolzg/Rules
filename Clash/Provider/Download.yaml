@@ -8,6 +8,7 @@ payload:
   - PROCESS-NAME,NeatDownloadManager.exe
   - PROCESS-NAME,MotrixNext
   - PROCESS-NAME,MotrixNext.exe
+  - PROCESS-NAME,motrix-next-engine
   - PROCESS-NAME,Folx
   - PROCESS-NAME,Folx.exe
   - PROCESS-NAME,NetTransport
