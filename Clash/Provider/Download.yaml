@@ -5,6 +5,9 @@ payload:
   - PROCESS-NAME,fdm
   - PROCESS-NAME,fdm.exe
   - PROCESS-NAME,NeatDownloadManager
+  - PROCESS-NAME,NeatDownloadManager.exe
+  - PROCESS-NAME,MotrixNext
+  - PROCESS-NAME,MotrixNext.exe
   - PROCESS-NAME,Folx
   - PROCESS-NAME,Folx.exe
   - PROCESS-NAME,NetTransport

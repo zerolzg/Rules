@@ -15,8 +15,6 @@
 # =============================================
 
 rules:
-  # 拦截 QUIC 流量功能（强制谷歌/YouTube回退到TCP，防降速）
-  - AND,((NETWORK,UDP),(DST-PORT,443)),REJECT
   # 使用 Mihomo 内置的 geosite 拦截 BT 追踪器
   - "GEOSITE,category-pt,DIRECT"
   - "RULE-SET,AdBlock,AdBlock"
