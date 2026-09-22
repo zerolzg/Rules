@@ -9,6 +9,7 @@ payload:
   - PROCESS-NAME,MotrixNext
   - PROCESS-NAME,MotrixNext.exe
   - PROCESS-NAME,motrix-next-engine
+  - PROCESS-NAME,Rayburst
   - PROCESS-NAME,Folx
   - PROCESS-NAME,Folx.exe
   - PROCESS-NAME,NetTransport
