@@ -390,13 +390,50 @@ textarea::placeholder { color: var(--text-muted); }
 .code-head .btn {
   margin-left: auto;
   margin-top: 0 !important; /* makeEditor 追加的按钮，置于 code-head 栏内应垂直居中 */
+  flex-shrink: 0; /* 被 flex 压缩会导致文本换行、按钮变成两行高 */
+  white-space: nowrap;
   background: transparent;
   color: var(--code-fname);
   border: 1px solid var(--code-border);
+  border-radius: 6px;
+  /* ⛶ 符号回退到系统符号字体，metrics 会把 normal 行盒撑到 ~27px，必须锁定行高 */
+  line-height: 1.2;
   padding: 2px 8px;
   font-size: 10px;
 }
 .code-head .btn:hover { color: var(--code-text); border-color: var(--code-fname); }
+/* head 面板：mode 切换控件已占 margin-left:auto，全屏按钮跟在其后即可 */
+#codewrap-head .code-head .btn { margin-left: 0; }
+
+/* ─── head DNS 模式切换（redir-host / fake-ip）─── */
+.head-mode-toggle {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+  padding: 2px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--code-border);
+  border-radius: 6px;
+}
+.head-mode-btn {
+  padding: 2px 8px;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--code-fname);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.head-mode-btn:hover { color: var(--code-text); }
+.head-mode-btn.active {
+  background: var(--btn-primary);
+  color: #fff;
+  font-weight: 700;
+}
 .codewrap-body {
   flex: 1;
   min-height: 0;

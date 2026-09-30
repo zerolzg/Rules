@@ -1,0 +1,49 @@
+ipv6: false
+mode: rule
+
+geo-auto-update: true
+# 单位：小时，默认：7 天
+geo-update-interval: 168
+geox-url:
+  geoip: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
+  geosite: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
+  mmdb: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
+  asn: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/GeoLite2-ASN.mmdb"
+
+dns:
+  enable: true
+  ipv6: false
+  listen: 0.0.0.0:1253
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  # 黑名单模式（默认）：命中以下规则的域名返回真实 IP，其余返回 fake-ip
+  fake-ip-filter:
+    - geosite:private
+    - geosite:cn
+    - +.lan
+    - +.local
+    - +.localhost
+    - +.localdomain
+    - +.msftconnecttest.com
+    - +.msftncsi.com
+    - time.windows.com
+    - time.apple.com
+    - time.android.com
+    - time.cloudflare.com
+  nameserver:
+    - https://cloudflare-dns.com/dns-query
+    - https://dns.google/dns-query
+  nameserver-policy:
+    geosite:cn,private:
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+  proxy-server-nameserver:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+  proxy-server-nameserver-policy:
+    +.cloud-nodes.com:
+      - 124.221.68.73:1053
+  respect-rules: true
+  prefer-h3: false
+  use-hosts: false
+  use-system-hosts: false

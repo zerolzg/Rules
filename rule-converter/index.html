@@ -84,6 +84,10 @@
           <div class="code-head">
             <span class="ctrl-dots"><i></i><i></i><i></i></span>
             <span class="fname">head.yaml</span>
+            <div class="head-mode-toggle" id="head-mode-toggle">
+              <button class="head-mode-btn active" id="head-mode-redir-host" onclick="switchHeadMode('redir-host')">redir-host</button>
+              <button class="head-mode-btn" id="head-mode-fake-ip" onclick="switchHeadMode('fake-ip')">fake-ip</button>
+            </div>
             <!-- ⛶ 全屏按钮由 app.js 的 makeEditor 追加到此 -->
           </div>
           <div class="codewrap-body"><div id="editor-head"></div></div>

@@ -11,7 +11,7 @@ const DEFAULT_RULES = "";
 // Load yaml files from server (fallback to empty)
 // ─────────────────────────────────────────
 async function loadYamlDefaults() {
-  const files = ["/rules.yaml", "/head.yaml"];
+  const files = ["/rules.yaml", "/head.yaml", "/head-fakeip.yaml"];
   const result = {};
   for (const f of files) {
     try {
@@ -31,7 +31,49 @@ const state = {
   ignoreInput: false,
   isDirty: false,
   isLoading: false,
+  headMode: "redir-host", // head 面板当前 DNS 模式：redir-host | fake-ip
 };
+
+// ─────────────────────────────────────────
+// head 模式切换（redir-host / fake-ip）
+// ─────────────────────────────────────────
+function updateHeadModeToggle() {
+  document
+    .getElementById("head-mode-redir-host")
+    ?.classList.toggle("active", state.headMode === "redir-host");
+  document
+    .getElementById("head-mode-fake-ip")
+    ?.classList.toggle("active", state.headMode === "fake-ip");
+}
+
+function switchHeadMode(mode) {
+  if (mode === state.headMode) return;
+  const defaults = window._headDefaults || {};
+  const target = defaults[mode];
+  if (target === undefined) {
+    showNotif("fake-ip head.yaml 加载失败，无法切换。", "err");
+    return;
+  }
+  // 当前内容偏离本模式默认值（有未保存改动）时先确认，整块替换会丢失改动
+  const currentDefault = defaults[state.headMode] || "";
+  const current = (window._cmContent || {})["editor-head"] ?? "";
+  if (
+    current !== currentDefault &&
+    !confirm("head.yaml 有未保存的修改，切换 DNS 模式将覆盖这些改动。继续？")
+  ) {
+    return;
+  }
+  state.headMode = mode;
+  updateHeadModeToggle();
+  // dispatch 会触发编辑器 updateListener：更新 _cmContent、标记 Dirty 并刷新预览
+  window._cmHead.dispatch({
+    changes: {
+      from: 0,
+      to: window._cmHead.state.doc.length,
+      insert: target,
+    },
+  });
+}
 
 // 总代理节点数（手动 + 订阅）
 function totalProxyCount() {
@@ -904,8 +946,8 @@ async function init() {
     // Fullscreen button
     const btn = document.createElement("button");
     btn.className = "btn btn-secondary";
-    btn.style.cssText = "font-size:11px;padding:4px 10px;margin-top:6px;";
-    btn.textContent = "⛶ Fullscreen";
+    btn.style.cssText = "font-size:10px;padding:2px 8px;margin-top:6px;";
+    btn.textContent = "⛶ 全屏";
     btn.addEventListener("click", () => expandEditor(domId, label, view));
     // 放入 code-head 栏（若存在），否则追加到父容器 —— 仅接线层调整
     const headBar = domEl.closest(".codewrap")?.querySelector(".code-head");
@@ -917,10 +959,14 @@ async function init() {
   };
 
   window._cmContent = {};
+  window._headDefaults = {
+    "redir-host": yamlDefaults["/head.yaml"] || DEFAULT_HEAD,
+    "fake-ip": yamlDefaults["/head-fakeip.yaml"] || DEFAULT_HEAD,
+  };
   window._cmHead = makeEditor(
     "editor-head",
     "# head.yaml",
-    yamlDefaults["/head.yaml"] || DEFAULT_HEAD,
+    window._headDefaults["redir-host"],
   );
   window._cmRules = makeEditor(
     "editor-rules",

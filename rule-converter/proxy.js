@@ -100,8 +100,9 @@ const ROUTES = {
   "/index.html": "index.html",
   "/app.js":     "app.js",
   "/style.css":  "style.css",
-  "/head.yaml":  "../Clash/Head_dns.yaml",
-  "/rules.yaml": "../Clash/Rule.yaml",
+  "/head.yaml":        "../Clash/Head_dns.yaml",
+  "/head-fakeip.yaml": "../Clash/Head_fakeip.yaml",
+  "/rules.yaml":       "../Clash/Rule.yaml",
 };
 
 // ─────────────────────────────────────────
