@@ -9603,6 +9603,7 @@ IP-CIDR,2402:8180::/32,no-resolve
 IP-CIDR,2402:8260::/32,no-resolve
 IP-CIDR,2402:8300::/32,no-resolve
 IP-CIDR,2402:8380::/32,no-resolve
+IP-CIDR,2402:8420::/32,no-resolve
 IP-CIDR,2402:85c0::/32,no-resolve
 IP-CIDR,2402:8800::/32,no-resolve
 IP-CIDR,2402:8840::/32,no-resolve
