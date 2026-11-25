@@ -36,6 +36,7 @@ rules:
   - "RULE-SET,PROXY,Proxy"
   - "RULE-SET,Domestic,Domestic"
   - "RULE-SET,Domestic IPs,Domestic"
+  - "RULE-SET,APNS,APNS"
   - "RULE-SET,LAN,DIRECT"
   - "GEOIP,CN,Domestic"
   - "MATCH,Others"
@@ -76,6 +77,12 @@ rule-providers:
     behavior: ipcidr
     url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/Domestic%20IPs.yaml"
     path: ./Rules/Domestic_IPs
+    interval: 86400
+  APNS:
+    type: http
+    behavior: classical
+    url: "https://cdn.jsdelivr.net/gh/zerolzg/Rules@main/Clash/Provider/APNS.yaml"
+    path: ./Rules/APNS
     interval: 86400
   LAN:
     type: http

@@ -513,6 +513,7 @@ const GROUP_TEMPLATES = [
   },
   { name: "CN Media", type: "select", proxies: ["DIRECT", "Proxy"], match: "" },
   { name: "Apple", type: "select", proxies: ["DIRECT", "Proxy"], match: "" },
+  { name: "APNS", type: "select", proxies: ["Proxy", "DIRECT"], match: "" },
   { name: "Telegram", type: "select", proxies: ["Proxy", "DIRECT"], match: "" },
   { name: "Crypto", type: "select", proxies: ["Proxy", "DIRECT"], match: "" },
   {
